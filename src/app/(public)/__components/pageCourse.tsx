@@ -5,6 +5,7 @@ async function PageCourse({ userId } : { userId: string }) {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   const response = await fetch(
     `${apiUrl}/api/course`,
+    { cache: 'no-store' },
   );
   const { data } = await response.json();
 
