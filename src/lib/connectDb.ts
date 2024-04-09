@@ -19,11 +19,11 @@ async function connectMongoDB() {
   }
 
   if (!cached.promise) {
-    const opts = {
-      bufferCommands: false,
-    };
+    // const opts = {
+    //   bufferCommands: false,
+    // };
 
-    cached.promise = mongoose.connect(uri as string, opts).then((mongo) => {
+    cached.promise = mongoose.connect(uri as string).then((mongo) => {
       console.log('Connected to database!');
       return mongo;
     });

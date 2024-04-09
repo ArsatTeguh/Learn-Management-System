@@ -23,8 +23,7 @@ function SignOut() {
   const onSubmit: SubmitHandler<Tinput> = async (data) => {
     setloading(true);
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-      const response = await fetch(`${apiUrl}/api/register`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

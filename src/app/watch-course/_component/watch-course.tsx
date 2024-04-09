@@ -42,8 +42,8 @@ async function updateProgress(url: string, { arg }: { arg: any }) {
 function WatchCourse({ courseId, userId }: Props) {
   const [currentVideo, setCurrentVideo] = useState<number>(0);
   const { Fetch } = CustomeFetch();
-  const { data, mutate } = useSWR(`/api/chapter/${courseId}/${userId}`, fetcher);
-  const { trigger } = useSWRMutation('/api/chapter/progress', updateProgress);
+  const { data, mutate } = useSWR(`${process.env.NEXT_PUBLIC_API_URL}/api/chapter/${courseId}/${userId}`, fetcher);
+  const { trigger } = useSWRMutation(`${process.env.NEXT_PUBLIC_API_URL}/api/chapter/progress`, updateProgress);
 
   const checkout = async () => {
     const request = {
@@ -54,7 +54,7 @@ function WatchCourse({ courseId, userId }: Props) {
     };
     try {
       const req = await Fetch({
-        url: 'api/tokenMidtrans',
+        url: `${process.env.NEXT_PUBLIC_API_URL}/api/tokenMidtrans`,
         method: 'POST',
         body: request,
       });
