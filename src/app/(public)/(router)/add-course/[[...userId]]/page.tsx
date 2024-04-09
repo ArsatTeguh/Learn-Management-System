@@ -85,7 +85,7 @@ function AddCourse() {
   const onSubmit = async () => {
     setloading(true);
     try {
-      const response = await Fetch({ url: '/api/course', method: 'POST', body: course });
+      const response = await Fetch({ url: 'api/course', method: 'POST', body: course });
       const result = await response?.json();
       if (!response.ok) {
         throw new Error(result.message);

@@ -24,7 +24,7 @@ function SignIn() {
   const onSubmit: SubmitHandler<Tinput> = async (data) => {
     setloading(true);
     try {
-      const response = await Fetch({ url: '/api/login', method: 'POST', body: data });
+      const response = await Fetch({ url: 'api/login', method: 'POST', body: data });
       const result = await response?.json();
       if (!response.ok) {
         throw new Error(result.message);

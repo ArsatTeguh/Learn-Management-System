@@ -13,7 +13,7 @@ export default function CustomeFetch() {
     method: string;
     body: Object;
   }) => {
-    const response = await fetch(`process.env.NEXT_PUBLIC_API_URL/${url}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/${url}`, {
       method,
       headers: {
         'Content-Type': 'application/json',

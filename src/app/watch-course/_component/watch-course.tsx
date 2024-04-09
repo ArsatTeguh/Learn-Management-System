@@ -54,7 +54,7 @@ function WatchCourse({ courseId, userId }: Props) {
     };
     try {
       const req = await Fetch({
-        url: `${process.env.NEXT_PUBLIC_API_URL}/api/tokenMidtrans`,
+        url: 'api/tokenMidtrans',
         method: 'POST',
         body: request,
       });
