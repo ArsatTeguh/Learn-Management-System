@@ -39,8 +39,8 @@ async function CreateAssets(chapter: any[]) {
 }
 
 export async function POST(request: Request | any) {
-  await connectMongoDB();
   try {
+    await connectMongoDB();
     await verifyToken(request);
     const body = await request.json();
     const { chapter } = body;
@@ -81,8 +81,8 @@ export async function POST(request: Request | any) {
 }
 
 export async function GET() {
-  await connectMongoDB();
   try {
+    await connectMongoDB();
     const data = await CourseModel.find();
     return NextResponse.json(
       { message: 'Success Get All Course', data: { data } },
