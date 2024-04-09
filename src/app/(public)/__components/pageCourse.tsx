@@ -2,9 +2,8 @@ import React from 'react';
 import CardCourse from './cardCourse';
 
 async function PageCourse({ userId } : { userId: string }) {
-  const apiUrl = process.env.API_URL;
   const response = await fetch(
-    `${apiUrl}/api/course`,
+    `${process.env.NEXT_PUBLIC_API_URL}/api/courseAll`,
     { cache: 'no-store' },
   );
   const { data } = await response.json();
