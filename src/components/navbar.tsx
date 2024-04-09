@@ -11,7 +11,6 @@ import { GiHamburgerMenu } from 'react-icons/gi';
 import { IoSearchOutline } from 'react-icons/io5';
 import { PiSignOut } from 'react-icons/pi';
 import { useDispatch, useSelector } from 'react-redux';
-import Sidebar from './sidebar';
 
 export type UserProps = {
   profile: string;
@@ -19,7 +18,7 @@ export type UserProps = {
   email: string;
 };
 
-function Navbar({ token, list }: { token: string; list: any }) {
+function Navbar({ token }: { token: string }) {
   const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.user);
   useEffect(() => {
@@ -51,7 +50,7 @@ function Navbar({ token, list }: { token: string; list: any }) {
               aria-label="close sidebar"
               className="drawer-overlay"
             />
-            <Sidebar list={list} />
+
           </div>
         </div>
         <div className="w-[45%] relative hidden md:block">
