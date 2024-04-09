@@ -14,8 +14,9 @@ export type PropsInput = {
 };
 
 export type Tinput = {
-  name: string;
   email: string;
+  password: string;
+  repeatPassword: string
 };
 
 export type IPropsLogin = {
