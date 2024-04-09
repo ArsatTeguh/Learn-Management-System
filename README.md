@@ -6,3 +6,6 @@
 - React redux toolkit
 - Jest
 - eslint
+- Midtrans client
+- Swr
+- uploadThing
