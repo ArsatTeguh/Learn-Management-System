@@ -11,7 +11,6 @@
     "test:watch": "jest --watchAll"
   },
   "dependencies": {
-    "@loadable/component": "^5.16.3",
     "@mux/mux-node": "^8.2.0",
     "@mux/mux-player-react": "^2.3.3",
     "@reduxjs/toolkit": "^2.0.1",
@@ -37,7 +36,6 @@
     "@types/bcrypt": "^5.0.2",
     "@types/jest": "^29.5.11",
     "@types/jsonwebtoken": "^9.0.6",
-    "@types/loadable__component": "^5.13.9",
     "@types/mongoose": "^5.11.97",
     "@types/react": "^18",
     "@types/react-dom": "^18",
