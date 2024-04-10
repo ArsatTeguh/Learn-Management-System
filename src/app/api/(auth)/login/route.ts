@@ -59,7 +59,15 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json(
-      { message: 'Login Success', data: { userId: currentUser.id } },
+      {
+        message: 'Login Success',
+        data: {
+          email: currentUser.email,
+          profile: currentUser.image,
+          role: currentUser.role,
+          userId: currentUser.id,
+        },
+      },
       { status: 200 },
     );
   } catch (error: any) {

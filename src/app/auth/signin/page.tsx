@@ -3,12 +3,14 @@
 import { Tinput } from '@/lib/login';
 import React, { useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Toast from '@/lib/toast';
 import CustomeFetch from '@/lib/customeFetch';
 
 function SignIn() {
   const [loading, setloading] = useState(false);
+  const router = useRouter();
   const { Fetch } = CustomeFetch();
   const {
     register,
@@ -33,7 +35,7 @@ function SignIn() {
           status: 'success',
           message: result.message,
         });
-        window.location.href = `/${result?.data?.userId}`;
+        router.refresh();
       }
     } catch (error: any) {
       Toast({
