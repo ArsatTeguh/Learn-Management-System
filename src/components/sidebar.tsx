@@ -51,11 +51,11 @@ function Sidebar({ list } : { list: ListProps[] }) {
   };
 
   useEffect(() => {
-    if (user?.userId) {
+    if (pathname === '/' && user?.userId) {
       const newPath = `/${user.userId}`;
       router.replace(newPath);
     }
-  }, [user?.userId, router]);
+  }, [user.userId, router, pathname]);
 
   useEffect(() => {
     if (modal.isModal) {
