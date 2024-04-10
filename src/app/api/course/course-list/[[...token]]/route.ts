@@ -46,7 +46,7 @@ export async function GET(
       );
     }
 
-    const decoded = jwt.verify(user, process.env.SECRET as string) as jwt.JwtPayload;
+    const decoded = jwt.verify(user, process.env.SCRET as string) as jwt.JwtPayload;
     if (decoded.role === 'teacher') {
       const listTeacher = teacher(decoded.userId);
       const listDefault = list(decoded.userId);
