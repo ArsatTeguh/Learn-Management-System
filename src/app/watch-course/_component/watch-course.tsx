@@ -36,7 +36,9 @@ function WatchCourse({ courseId, userId }: Props) {
       setMessageSocket(null);
     },
   });
-  const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL as string);
+  const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL as string, {
+    withCredentials: true,
+  });
   const checkout = async () => {
     const request = {
       id: courseId,
