@@ -7,7 +7,7 @@ import useSWR from 'swr';
 import Toast from '@/lib/toast';
 import CustomeFetch from '@/lib/customeFetch';
 import calculateProgress from '@/lib/calculateProgress';
-import io from 'Socket.io-client';
+import { io } from 'socket.io-client';
 import SidebarChapter from './sidebar';
 import VideoPage from './videoPage';
 import Message from './message';
