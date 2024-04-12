@@ -1,6 +1,6 @@
 import MuxPlayer from '@mux/mux-player-react';
 import React from 'react';
-import { SlLike, SlDislike } from 'react-icons/sl';
+import { BiSolidDislike, BiSolidLike } from 'react-icons/bi';
 
 function VideoPage({
   video,
@@ -10,6 +10,8 @@ function VideoPage({
   progress,
   onAction,
   userId,
+  progressSocket,
+  actionSocket,
 }: {
   video: any;
   currentVideo: number;
@@ -28,8 +30,10 @@ function VideoPage({
     name: string;
   }) => void,
   userId: string
-
+  progressSocket: any
+  actionSocket: any
 }) {
+  const action = actionSocket?.filter((item: any) => item?.id === currentVideo);
   return (
     <div className="mt-4">
       {video.chapter_course[currentVideo].unLock ? (
@@ -53,27 +57,27 @@ function VideoPage({
           </p>
           <div className="flex items-center gap-6 text-lg">
             <span
-              className={`${video?.chapter_course[currentVideo]?.action?.isLike.includes(userId) && 'text-sky-600'} flex items-center gap-2 font-medium cursor-pointer`}
+              className={`${action && action[0]?.like?.includes(userId) && 'text-sky-600'} flex items-center text-xl gap-2 font-medium cursor-pointer`}
               onClick={() => onAction({
                 message: '', like: true, dislike: false, name: '',
               })}
             >
-              <SlLike />
-              <span className="text-sm">{video.chapter_course[currentVideo]?.action.isLike.length}</span>
+              <BiSolidLike />
+              <span className="text-sm">{(action && action[0]?.like?.length) ?? 0}</span>
             </span>
             <span
-              className={`${video?.chapter_course[currentVideo]?.action?.isDislike.includes(userId) && 'text-sky-600'} flex items-center gap-2 font-medium cursor-pointer`}
+              className={`${action && action[0]?.dislike?.includes(userId) && 'text-red-600'} flex text-xl items-center gap-2 font-medium cursor-pointer`}
               onClick={() => onAction({
                 message: '', like: false, dislike: true, name: '',
               })}
             >
-              <SlDislike />
-              <span className="text-sm ">{video.chapter_course[currentVideo]?.action.isDislike.length}</span>
+              <BiSolidDislike />
+              <span className="text-sm ">{(action && action[0]?.dislike?.length) ?? 0}</span>
             </span>
           </div>
         </div>
 
-        {video.chapter_course[currentVideo].unLock ? (
+        {video.chapter_course[currentVideo]?.unLock ? (
           <div className="">
             <button
               onClick={checkout}
@@ -86,7 +90,10 @@ function VideoPage({
         ) : (
           <div className="">
             <button
-              disabled={progress?.includes(video?.chapter_course[currentVideo].asset_id)}
+              disabled={
+              progress?.includes(video?.chapter_course[currentVideo].asset_id)
+              || progressSocket.chapter?.includes(video?.chapter_course[currentVideo].asset_id)
+              }
               onClick={onProgress}
               type="button"
               className=" disabled:bg-zinc-500 px-8 py-2 bg-sky-500 text-white font-medium rounded"

@@ -38,8 +38,9 @@ export async function GET(
 ) {
   try {
     const user = params?.token[0];
+    const listNoUser = list('');
+
     if (user === 'undefined') {
-      const listNoUser = list('');
       return NextResponse.json(
         { message: 'Sidebar not teacher', data: listNoUser },
         { status: 200 },
@@ -56,6 +57,11 @@ export async function GET(
         { status: 200 },
       );
     }
+
+    return NextResponse.json(
+      { message: 'Sidebar not teacher', data: listNoUser },
+      { status: 200 },
+    );
   } catch (error: any) {
     return NextResponse.json(
       { message: error.message },

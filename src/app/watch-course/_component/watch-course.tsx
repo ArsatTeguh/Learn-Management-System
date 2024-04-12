@@ -1,50 +1,42 @@
 'use client';
 
-import React, { useCallback, useState, Suspense } from 'react';
+import React, {
+  useCallback, useState, Suspense, useEffect,
+} from 'react';
 import useSWR from 'swr';
 import Toast from '@/lib/toast';
 import CustomeFetch from '@/lib/customeFetch';
-import useSWRMutation from 'swr/mutation';
 import calculateProgress from '@/lib/calculateProgress';
+import io from 'Socket.io-client';
 import SidebarChapter from './sidebar';
 import VideoPage from './videoPage';
 import Message from './message';
+import {
+  ActionType, CallbackMessage, fetcher, InputAction, MessageType, OnActionType, ProgressType,
+  updateProgress,
+} from './typeData';
 
 type Props = {
   userId: string;
   courseId: string;
 };
 
-async function fetcher(url: string) {
-  const res = await fetch(url, {
-    headers: {
-      Accept: 'application/json',
-    },
-  });
-  const result = await res.json();
-  return result.data;
-}
-
-async function updateProgress(url: string, { arg }: { arg: any }) {
-  const response = await fetch(url, {
-    method: 'POST',
-    body: JSON.stringify(arg),
-  });
-  if (response.status === 401) {
-    Toast({
-      status: 'error',
-      message: 'Your Must Login',
-    });
-  }
-  return response;
-}
-
 function WatchCourse({ courseId, userId }: Props) {
   const [currentVideo, setCurrentVideo] = useState<number>(0);
+  const [actionSocket, setActionSocket] = useState<Array<ActionType> | null>(null);
+  const [messageSocket, setMessageSocket] = useState<Array<MessageType> | null >(null);
+  const [progressSocket, setProgressSocket] = useState<ProgressType>({ count: -1, chapter: [] });
   const { Fetch } = CustomeFetch();
-  const { data, mutate } = useSWR(`${process.env.NEXT_PUBLIC_API_URL}/api/chapter/${courseId}/${userId}`, fetcher);
-  const { trigger } = useSWRMutation(`${process.env.NEXT_PUBLIC_API_URL}/api/chapter/progress`, updateProgress);
-
+  const { data, mutate } = useSWR(`${process.env.NEXT_PUBLIC_API_URL}/api/chapter/${courseId}/${userId}`, fetcher, {
+    onSuccess: () => {
+      Toast({
+        status: 'success',
+        message: 'Revalidate Date',
+      });
+      setMessageSocket(null);
+    },
+  });
+  const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL as string);
   const checkout = async () => {
     const request = {
       id: courseId,
@@ -71,34 +63,41 @@ function WatchCourse({ courseId, userId }: Props) {
     }
   };
 
-  const onProgress = () => {
+  const checkOnActionById = ({ index, like, dislike } : OnActionType) => {
+    const valueById = {
+      id: index,
+      like,
+      dislike,
+    };
+    setActionSocket((prev) => {
+      const safePrev = prev || [];
+      return [...safePrev, valueById];
+    });
+  };
+
+  const onProgress = async () => {
     if (userId) {
       const dataProgress = {
         courseId,
         chapterId: data?.course?.chapter_course[currentVideo]?.asset_id,
       };
-      trigger(dataProgress);
-    }
-    setCurrentVideo((prev) => {
-      // eslint-disable-next-line no-unsafe-optional-chaining
-      if (prev === data?.course?.chapter_course.length - 1) {
-        return (prev = 0);
+      const res = await updateProgress(`${process.env.NEXT_PUBLIC_API_URL}/api/chapter/progress`, dataProgress);
+      if (res.status === 200) {
+        socket.emit('pesanDariKlien', { count: data?.progress[0].progress?.length ?? 0, chapter: data?.course?.chapter_course[currentVideo]?.asset_id });
       }
-      return prev + 1;
-    });
+    }
+    // eslint-disable-next-line no-unsafe-optional-chaining
+    if (currentVideo < data?.course?.chapter_course.length - 1) {
+      setCurrentVideo((prev) => prev + 1);
+    }
   };
 
-  const onAction = ({
-    message,
-    like,
-    dislike,
-    name,
-  }: {
-    message: string;
-    like: boolean;
-    dislike: boolean;
-    name: string;
-  }) => {
+  const onAction = (
+    {
+      message, like, dislike, name,
+    }:
+    InputAction,
+  ) => {
     const requestAction = {
       message,
       like,
@@ -110,32 +109,115 @@ function WatchCourse({ courseId, userId }: Props) {
       chapterId: currentVideo,
       data: requestAction,
     };
-    Fetch({ url: 'api/chapter/message', method: 'POST', body: req });
-    mutate();
+    if (message.trim() !== '') {
+      socket.emit('message', { name, message, currentVideo: data?.course?.chapter_course[currentVideo]?.asset_id });
+    } else {
+      const currenAction = actionSocket?.filter((item: ActionType) => item.id === currentVideo);
+      socket.emit('message', {
+        message,
+        like,
+        dislike,
+        actionSocket: currenAction ? currenAction[0] : {},
+        user: userId,
+        currentVideo: data?.course?.chapter_course[currentVideo]?.asset_id,
+        index: currentVideo,
+      });
+    }
+    Fetch({ url: 'api/chapter/message', method: 'POST', body: req }).then((res) => {
+      if (res.status === 200 && message.trim() !== '') {
+        socket.emit('pesanDariKlien', { name, message });
+      } else {
+        socket.emit('like-dislike', { dislike, like });
+      }
+      mutate();
+    });
   };
 
-  const onCurrentVideo = useCallback((e: number) => setCurrentVideo(e), []);
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
+  useEffect(() => {
+    socket.on('connection', () => {
+      console.log('connected');
+    });
+    // Mendengarkan pesan dari server
+    socket.on('pesanDariServer', (teks) => {
+      setProgressSocket((prev) => ({
+        count: teks.count,
+        chapter: [...prev.chapter, teks.chapter],
+      }));
+    });
+
+    socket.on('action', (teks: ActionType) => {
+      setActionSocket((prev: ActionType[] | null) => {
+        if (!prev) return null;
+        return prev.map((item) => {
+          if (item.id === currentVideo) {
+            return teks;
+          }
+          return item;
+        });
+      });
+    });
+    socket.on('chat', (teks: CallbackMessage) => {
+      setMessageSocket((prev) => {
+        const newprev = prev || [];
+        return [...newprev,
+          { name: teks.name, message: teks.message, currentVideo: teks.currentVideo }];
+      });
+    });
+
+    return () => {
+      // socket.off('pesanDariServer'); // Memastikan untuk membersihkan listener
+      socket.off('chat'); // Memastikan untuk membersihkan listener
+      socket.off('action'); // Memastikan untuk membersihkan listener
+      socket.disconnect();
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [socket]);
+
+  const onCalculate = () => {
+    if (progressSocket.count === -1) {
+      return calculateProgress(
+        data?.progress[0].progress?.length ?? 0,
+        data?.course?.chapter_course?.length,
+      );
+    }
+    return calculateProgress(
+      progressSocket.count,
+      data?.course?.chapter_course?.length,
+    );
+  };
+  const onCurrentVideo = useCallback((videoId: number) => {
+    setCurrentVideo(videoId);
+  }, []);
+
+  useEffect(() => {
+    data?.course?.chapter_course.map((item: any, index: number) => checkOnActionById(
+      { index, like: item.action.isLike, dislike: item.action.isDislike },
+    ));
+  }, [data]);
+
+  useEffect(() => {
+    socket.emit('joinRoom', { currentVideo: data?.course?.chapter_course[currentVideo]?.asset_id });
+    return () => {
+      socket.emit('leaveRoom', { currentVideo: data?.course?.chapter_course[currentVideo]?.asset_id });
+    };
+  }, [currentVideo, data, socket]);
+
   return (
-    <div className=" ">
+    <div>
       <div className="h-full lg:block hidden mt-20 fixed lg:overflow-y-hidden  border-r-[1px] ">
         <p className="font-medium px-4 py-3 text-md text-zinc-800">
           {data?.course?.title}
         </p>
         {data?.progress?.length > 0 && (
-          <div className="px-3 border-b pb-4">
+          <div className="px-3 border-b pb-4 transition-all">
             <progress
               className="progress w-full progress-info transition-all"
-              value={calculateProgress(
-                data?.progress[0].progress?.length,
-                data?.course?.chapter_course?.length,
-              )}
+              value={onCalculate()}
               max="100"
             />
             <p className="font-medium text-sm">
-              {calculateProgress(
-                data?.progress[0].progress?.length ?? 0,
-                data?.course?.chapter_course?.length,
-              )}
+              {onCalculate()}
               % Complete
             </p>
           </div>
@@ -164,6 +246,8 @@ function WatchCourse({ courseId, userId }: Props) {
                   progress={data?.progress[0]?.progress}
                   onAction={onAction}
                   userId={userId}
+                  progressSocket={progressSocket}
+                  actionSocket={actionSocket}
                 />
               </Suspense>
             )}
@@ -174,16 +258,30 @@ function WatchCourse({ courseId, userId }: Props) {
               <span className="block w-[50%] h-[2px] bg-zinc-400 rounded-full" />
               <span className="block w-[25%] h-[2px] mt-1 bg-zinc-400 rounded-full" />
             </div>
-            <div className="flex flex-col  gap-4 w-full bg-slate-300/20 p-4 rounded-md">
-              {data?.course?.chapter_course[currentVideo]?.comment?.map((item: any) => (
-                <div key={item.message} className="border-b w-full">
-                  <p className="text-sm font-medium text-black">@{item?.user}</p>
-                  <p className="text-xs text-justify text-black">
-                    {item?.message}
-                  </p>
-                  <span className="w-full block bg-zinc-200 h-[1px] mt-1 rounded-full" />
-                </div>
-              ))}
+            <div className="flex flex-col  gap-4 w-full bg-slate-300/20 p-4 rounded-md max-h-[50%] overflow-y-auto">
+              {data?.course?.chapter_course[currentVideo]
+                ?.comment?.map((item: any, index: number) => (
+                  // eslint-disable-next-line react/no-array-index-key
+                  <div key={index} className="border-b w-full">
+                    <p className="text-sm font-medium text-black">@{item?.user}</p>
+                    <p className="text-xs text-justify text-black">
+                      {item?.message}
+                    </p>
+                    <span className="w-full block bg-zinc-200 h-[1px] mt-1 rounded-full" />
+                  </div>
+                ))}
+              {messageSocket?.filter((item) => item.currentVideo
+              === data?.course?.chapter_course[currentVideo]?.asset_id)
+                .map((item, index: number) => (
+                  // eslint-disable-next-line react/no-array-index-key
+                  <div key={index} className="border-b w-full">
+                    <p className="text-sm font-medium text-black">@{item?.name}</p>
+                    <p className="text-xs text-justify text-black">
+                      {item?.message}
+                    </p>
+                    <span className="w-full block bg-zinc-200 h-[1px] mt-1 rounded-full" />
+                  </div>
+                ))}
             </div>
             <Message onAction={onAction} />
           </div>

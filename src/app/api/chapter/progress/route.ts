@@ -19,34 +19,27 @@ export async function POST(request: Request | any) {
         { status: 400 },
       );
     }
-    // const newdata = validationProgress[0];
 
-    // if (!newdata.progress) {
-    //   console.log('true');
-    //   newdata.progress = [];
-    // }
-
-    // const existChpaterIdFromProgress = newdata.progress.filter(
-    //   (item: string) => item === chapterId,
-    // );
-
-    // if (existChpaterIdFromProgress.length === 0) {
-
-    // }
-    const result = await ProgressModel.findOneAndUpdate(
-      { course_id: courseId, user_id: request.id },
-      { $push: { progress: chapterId } },
-      { new: true },
+    const validasiDoubleUserId = validationProgress[0].progress.filter(
+      (item: string) => item === chapterId,
     );
 
+    if (validasiDoubleUserId.length === 0) {
+      await ProgressModel.findOneAndUpdate(
+        { course_id: courseId, user_id: request.id },
+        { $push: { progress: chapterId } },
+        { new: true },
+      );
+    }
+
     return NextResponse.json(
-      { message: 'Success update progress', data: result },
+      { message: 'Success update progress', data: validasiDoubleUserId.length },
       { status: 200 },
     );
   } catch (error: any) {
     return NextResponse.json(
       { message: error.message },
-      { status: error.status },
+      { status: error.status || 500 },
     );
   }
 }

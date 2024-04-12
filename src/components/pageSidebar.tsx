@@ -1,6 +1,10 @@
 import { cookies } from 'next/headers';
 import React, { Suspense } from 'react';
-import Sidebar from './sidebar';
+import dynamic from 'next/dynamic';
+
+const DynamicSidebar = dynamic(() => import('./sidebar'), {
+  ssr: false,
+});
 
 async function PageSidebar() {
   const cookieStore = cookies();
@@ -11,7 +15,7 @@ async function PageSidebar() {
   const req = await res.json();
   return (
     <Suspense fallback="">
-      <Sidebar list={req.data} />
+      <DynamicSidebar list={req.data} />
     </Suspense>
   );
 }

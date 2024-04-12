@@ -35,6 +35,7 @@ function SignIn() {
           status: 'success',
           message: result.message,
         });
+        router.push('/');
         router.refresh();
       }
     } catch (error: any) {
