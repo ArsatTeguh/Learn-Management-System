@@ -1,9 +1,10 @@
-import dynamic from 'next/dynamic';
+// import dynamic from 'next/dynamic';
 import React from 'react';
+import WatchCourse from '../_component/watch-course';
 
-const DynamicWatchCourse = dynamic(() => import('../_component/watch-course'), {
-  ssr: false,
-});
+// const DynamicWatchCourse = dynamic(() => import('../_component/watch-course'), {
+//   ssr: false,
+// });
 async function PageWatchCourse({ params }: { params: { slug: string[] } }) {
   const userId = !params.slug[1] ? '' : params.slug[1];
   const courseId = !params.slug[0] ? '' : params.slug[0];
@@ -11,7 +12,7 @@ async function PageWatchCourse({ params }: { params: { slug: string[] } }) {
   const { data } = await res.json();
   return (
     <div className="">
-      <DynamicWatchCourse courseId={courseId} userId={userId} data={data} />
+      <WatchCourse courseId={courseId} userId={userId} data={data} />
     </div>
   );
 }
