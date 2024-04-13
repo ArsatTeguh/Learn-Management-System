@@ -4,12 +4,14 @@ import React from 'react';
 const DynamicWatchCourse = dynamic(() => import('../_component/watch-course'), {
   ssr: false,
 });
-function PageWatchCourse({ params }: { params: { slug: string[] } }) {
+async function PageWatchCourse({ params }: { params: { slug: string[] } }) {
   const userId = !params.slug[1] ? '' : params.slug[1];
   const courseId = !params.slug[0] ? '' : params.slug[0];
+  const res = await fetch(`http://localhost:3000/api/chapter/${courseId}/${userId}`);
+  const { data } = await res.json();
   return (
     <div className="">
-      <DynamicWatchCourse courseId={courseId} userId={userId} />
+      <DynamicWatchCourse courseId={courseId} userId={userId} data={data} />
     </div>
   );
 }

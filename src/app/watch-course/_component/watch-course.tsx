@@ -3,7 +3,6 @@
 import React, {
   useCallback, useState, Suspense, useEffect,
 } from 'react';
-import useSWR from 'swr';
 import Toast from '@/lib/toast';
 import CustomeFetch from '@/lib/customeFetch';
 import calculateProgress from '@/lib/calculateProgress';
@@ -12,30 +11,24 @@ import SidebarChapter from './sidebar';
 import VideoPage from './videoPage';
 import Message from './message';
 import {
-  ActionType, CallbackMessage, fetcher, InputAction, MessageType, OnActionType, ProgressType,
+  ActionType, CallbackMessage, InputAction, MessageType, OnActionType, ProgressType,
   updateProgress,
 } from './typeData';
 
 type Props = {
   userId: string;
   courseId: string;
+  data: any;
 };
 
-function WatchCourse({ courseId, userId }: Props) {
+function WatchCourse({ courseId, userId, data }: Props) {
   const [currentVideo, setCurrentVideo] = useState<number>(0);
+  const [isClient, setisClient] = useState(false);
   const [actionSocket, setActionSocket] = useState<Array<ActionType> | null>(null);
   const [messageSocket, setMessageSocket] = useState<Array<MessageType> | null >(null);
   const [progressSocket, setProgressSocket] = useState<ProgressType>({ count: -1, chapter: [] });
   const { Fetch } = CustomeFetch();
-  const { data, mutate } = useSWR(`${process.env.NEXT_PUBLIC_API_URL}/api/chapter/${courseId}/${userId}`, fetcher, {
-    onSuccess: () => {
-      Toast({
-        status: 'success',
-        message: 'Revalidate Date',
-      });
-      setMessageSocket(null);
-    },
-  });
+
   const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL as string, {
     withCredentials: true,
   });
@@ -131,23 +124,61 @@ function WatchCourse({ courseId, userId }: Props) {
       } else {
         socket.emit('like-dislike', { dislike, like });
       }
-      mutate();
     });
   };
 
   // eslint-disable-next-line @typescript-eslint/no-use-before-define
   useEffect(() => {
-    socket.on('connection', () => {
-      console.log('connected');
-    });
-    // Mendengarkan pesan dari server
+    if (!isClient) {
+      socket.on('connection', () => {
+        setisClient(true);
+      });
+    }
+    console.log('dirender');
+    return () => {};
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [socket]);
+
+  const onCalculate = () => calculateProgress(
+    progressSocket.count,
+    data?.course?.chapter_course?.length,
+  );
+
+  const onCurrentVideo = useCallback((videoId: number) => {
+    setCurrentVideo(videoId);
+  }, []);
+
+  useEffect(() => {
+    data?.course?.chapter_course.map((item: any, index: number) => checkOnActionById(
+      { index, like: item.action.isLike, dislike: item.action.isDislike },
+    ));
+    setProgressSocket(
+      {
+        count: data?.progress[0]?.progress?.length ?? 0,
+        chapter: data?.course?.chapter_course[currentVideo]?.asset_id,
+      },
+    );
+    return () => {};
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (!isClient) {
+      socket.emit('joinRoom', { currentVideo: data?.course?.chapter_course[currentVideo]?.asset_id });
+    }
+    return () => {
+      socket.emit('leaveRoom', { currentVideo: data?.course?.chapter_course[currentVideo]?.asset_id });
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentVideo, socket]);
+
+  useEffect(() => {
     socket.on('pesanDariServer', (teks) => {
       setProgressSocket((prev) => ({
         count: teks.count,
         chapter: [...prev.chapter, teks.chapter],
       }));
     });
-
     socket.on('action', (teks: ActionType) => {
       setActionSocket((prev: ActionType[] | null) => {
         if (!prev) return null;
@@ -166,7 +197,6 @@ function WatchCourse({ courseId, userId }: Props) {
           { name: teks.name, message: teks.message, currentVideo: teks.currentVideo }];
       });
     });
-
     return () => {
       // socket.off('pesanDariServer'); // Memastikan untuk membersihkan listener
       socket.off('chat'); // Memastikan untuk membersihkan listener
@@ -174,36 +204,7 @@ function WatchCourse({ courseId, userId }: Props) {
       socket.disconnect();
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [socket]);
-
-  const onCalculate = () => {
-    if (progressSocket.count === -1) {
-      return calculateProgress(
-        data?.progress[0].progress?.length ?? 0,
-        data?.course?.chapter_course?.length,
-      );
-    }
-    return calculateProgress(
-      progressSocket.count,
-      data?.course?.chapter_course?.length,
-    );
-  };
-  const onCurrentVideo = useCallback((videoId: number) => {
-    setCurrentVideo(videoId);
   }, []);
-
-  useEffect(() => {
-    data?.course?.chapter_course.map((item: any, index: number) => checkOnActionById(
-      { index, like: item.action.isLike, dislike: item.action.isDislike },
-    ));
-  }, [data]);
-
-  useEffect(() => {
-    socket.emit('joinRoom', { currentVideo: data?.course?.chapter_course[currentVideo]?.asset_id });
-    return () => {
-      socket.emit('leaveRoom', { currentVideo: data?.course?.chapter_course[currentVideo]?.asset_id });
-    };
-  }, [currentVideo, data, socket]);
 
   return (
     <div>
