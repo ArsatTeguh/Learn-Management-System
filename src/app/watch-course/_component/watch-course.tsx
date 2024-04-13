@@ -260,7 +260,6 @@ function WatchCourse({ courseId, userId }: Props) {
                   onProgress={onProgress}
                   video={data?.course}
                   currentVideo={currentVideo}
-                  progress={data?.progress[0]?.progress}
                   onAction={onAction}
                   userId={userId}
                   progressSocket={progressSocket}

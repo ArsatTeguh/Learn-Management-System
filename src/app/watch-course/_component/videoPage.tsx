@@ -7,7 +7,6 @@ function VideoPage({
   currentVideo,
   checkout,
   onProgress,
-  progress,
   onAction,
   userId,
   progressSocket,
@@ -17,7 +16,6 @@ function VideoPage({
   currentVideo: number;
   checkout: () => Promise<void>;
   onProgress: () => void
-  progress: Array<string>
   onAction: ({
     message,
     like,
