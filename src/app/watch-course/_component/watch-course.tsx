@@ -7,7 +7,8 @@ import useSWR from 'swr';
 import Toast from '@/lib/toast';
 import CustomeFetch from '@/lib/customeFetch';
 import calculateProgress from '@/lib/calculateProgress';
-import { io } from 'socket.io-client';
+import Pusher from 'pusher-js';
+import { FetchSocket, pusherClient } from '@/lib/fetchSocket';
 import SidebarChapter from './sidebar';
 import VideoPage from './videoPage';
 import Message from './message';
@@ -23,11 +24,14 @@ type Props = {
 
 function WatchCourse({ courseId, userId }: Props) {
   const [currentVideo, setCurrentVideo] = useState<number>(0);
-  const [isClient, setisClient] = useState(false);
   const [actionSocket, setActionSocket] = useState<Array<ActionType> | null>(null);
   const [messageSocket, setMessageSocket] = useState<Array<MessageType> | null >(null);
   const [progressSocket, setProgressSocket] = useState<ProgressType | null>(null);
   const { Fetch } = CustomeFetch();
+  const pusherClinet = new Pusher('3006004164fdcfb53231', {
+    cluster: 'ap1',
+    forceTLS: true,
+  });
   const { data } = useSWR(`${process.env.NEXT_PUBLIC_API_URL}/api/chapter/${courseId}/${userId}`, fetcher, {
     onSuccess: () => {
       Toast({
@@ -39,9 +43,7 @@ function WatchCourse({ courseId, userId }: Props) {
     revalidateOnFocus: false,
     revalidateOnReconnect: false,
   });
-  const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL as string, {
-    withCredentials: true,
-  });
+  const chapterId = data?.course?.chapter_course[currentVideo]?.asset_id;
   const checkout = async () => {
     const request = {
       id: courseId,
@@ -84,25 +86,25 @@ function WatchCourse({ courseId, userId }: Props) {
     if (userId) {
       const dataProgress = {
         courseId,
-        chapterId: data?.course?.chapter_course[currentVideo]?.asset_id,
+        chapterId,
       };
       const res = await updateProgress(`${process.env.NEXT_PUBLIC_API_URL}/api/chapter/progress`, dataProgress);
       setProgressSocket((prev) => {
         const newprev = prev ?? { count: 0, chapter: [] };
         return {
           count: newprev.count,
-          chapter: [...newprev.chapter, data?.course?.chapter_course[currentVideo]?.asset_id],
+          chapter: [...newprev.chapter, chapterId],
         };
       });
-      if (res.status === 200) {
-        setProgressSocket((prev) => {
-          const newprev = prev ?? { count: 0, chapter: [] };
-          return {
-            count: newprev.count,
-            chapter: [...newprev.chapter, data?.course?.chapter_course[currentVideo]?.asset_id],
-          };
-        });
-      }
+      // if (res.status === 200) {
+      //   setProgressSocket((prev) => {
+      //     const newprev = prev ?? { count: 0, chapter: [] };
+      //     return {
+      //       count: newprev.count,
+      //       chapter: [...newprev.chapter, chapterId],
+      //     };
+      //   });
+      // }
     }
     // eslint-disable-next-line no-unsafe-optional-chaining
     if (currentVideo < data?.course?.chapter_course.length - 1) {
@@ -110,7 +112,7 @@ function WatchCourse({ courseId, userId }: Props) {
     }
   };
 
-  const onAction = (
+  const onAction = async (
     {
       message, like, dislike, name,
     }:
@@ -128,38 +130,27 @@ function WatchCourse({ courseId, userId }: Props) {
       data: requestAction,
     };
     if (message.trim() !== '') {
-      socket.emit('message', { name, message, currentVideo: data?.course?.chapter_course[currentVideo]?.asset_id });
+      await FetchSocket({ url: 'message', body: { name, message, currentVideo: chapterId } });
     } else {
       const currenAction = actionSocket?.filter((item: ActionType) => item.id === currentVideo);
-      socket.emit('message', {
-        message,
-        like,
-        dislike,
-        actionSocket: currenAction ? currenAction[0] : {},
-        user: userId,
-        currentVideo: data?.course?.chapter_course[currentVideo]?.asset_id,
-        index: currentVideo,
+      FetchSocket({
+        url: 'action',
+        body:
+        {
+          message,
+          like,
+          dislike,
+          actionSocket: currenAction ? currenAction[0] : {},
+          user: userId,
+          currentVideo: chapterId,
+          index: currentVideo,
+        },
       });
     }
-    Fetch({ url: 'api/chapter/message', method: 'POST', body: req }).then((res) => {
-      if (res.status === 200 && message.trim() !== '') {
-        socket.emit('pesanDariKlien', { name, message });
-      } else {
-        socket.emit('like-dislike', { dislike, like });
-      }
-    });
-  };
+    // Fetch({ url: 'api/chapter/message', method: 'POST', body: req }).then((res) => {
 
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
-  useEffect(() => {
-    if (!isClient) {
-      socket.on('connection', () => {
-        setisClient(true);
-      });
-    }
-    return () => {};
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [socket]);
+    // });
+  };
 
   const onCalculate = () => calculateProgress(
     progressSocket?.chapter?.length as number,
@@ -182,43 +173,44 @@ function WatchCourse({ courseId, userId }: Props) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
-  useEffect(() => {
-    if (!isClient) {
-      socket.emit('joinRoom', { currentVideo: data?.course?.chapter_course[currentVideo]?.asset_id });
-    }
-    return () => {
-      socket.emit('leaveRoom', { currentVideo: data?.course?.chapter_course[currentVideo]?.asset_id });
-    };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentVideo, socket]);
+  const handlerMessage = (res: CallbackMessage) => {
+    console.log(res);
+    setMessageSocket((prev) => {
+      const newprev = prev || [];
+      return [...newprev,
+        { name: res.name, message: res.message, currentVideo: res.currentVideo }];
+    });
+  };
 
   useEffect(() => {
-    socket.on('action', (teks: ActionType) => {
+    const handlerAction = (res: ActionType) => {
       setActionSocket((prev: ActionType[] | null) => {
         if (!prev) return null;
         return prev.map((item) => {
           if (item.id === currentVideo) {
-            return teks;
+            return res;
           }
           return item;
         });
       });
-    });
-    socket.on('chat', (teks: CallbackMessage) => {
-      setMessageSocket((prev) => {
-        const newprev = prev || [];
-        return [...newprev,
-          { name: teks.name, message: teks.message, currentVideo: teks.currentVideo }];
-      });
-    });
-    return () => {
-      // socket.off('pesanDariServer'); // Memastikan untuk membersihkan listener
-      socket.off('chat'); // Memastikan untuk membersihkan listener
-      socket.off('action'); // Memastikan untuk membersihkan listener
-      // socket.disconnect();
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [socket]);
+    let channel: any;
+    if (chapterId) {
+      channel = pusherClinet.subscribe(chapterId);
+      channel.bind('chat', (res: CallbackMessage) => {
+        handlerMessage(res);
+      });
+      channel.bind('behavior', (res: ActionType) => {
+        handlerAction(res);
+      });
+      console.log('render');
+      return () => {
+        channel.unbind('chat', handlerMessage);
+        channel.unbind('behavior', handlerAction);
+        pusherClinet.unsubscribe(chapterId);
+      };
+    }
+  }, [chapterId, currentVideo, pusherClinet]);
 
   return (
     <div>
@@ -287,7 +279,7 @@ function WatchCourse({ courseId, userId }: Props) {
                   </div>
                 ))}
               {messageSocket?.filter((item) => item.currentVideo
-              === data?.course?.chapter_course[currentVideo]?.asset_id)
+              === chapterId)
                 .map((item, index: number) => (
                   // eslint-disable-next-line react/no-array-index-key
                   <div key={index} className="border-b w-full">
