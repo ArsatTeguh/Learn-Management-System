@@ -30,13 +30,6 @@ function WatchCourse({ courseId, userId }: Props) {
   const { Fetch } = CustomeFetch();
 
   const { data } = useSWR(`${process.env.NEXT_PUBLIC_API_URL}/api/chapter/${courseId}/${userId}`, fetcher, {
-    onSuccess: () => {
-      Toast({
-        status: 'success',
-        message: 'Revalidate Date',
-      });
-      setMessageSocket(null);
-    },
     revalidateOnFocus: false,
     revalidateOnReconnect: false,
   });

@@ -13,7 +13,7 @@ function Footer() {
         isLogin ? 'lg:pl-0' : 'lg:pl-64'
       }`}
     >
-      <footer className="footer footer-center p-10 bg-base-200 text-base-content rounded">
+      <footer className="footer footer-center p-10 bg-slate-300/20 text-base-content rounded">
         <nav className="grid grid-flow-col gap-4">
           <span className="link link-hover">About us</span>
           <span className="link link-hover">Contact</span>
