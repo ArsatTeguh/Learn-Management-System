@@ -172,20 +172,18 @@ function WatchCourse({ courseId, userId }: Props) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
-  const handlerMessage = (res: CallbackMessage) => {
-    console.log(res);
-    setMessageSocket((prev) => {
-      const newprev = prev || [];
-      return [...newprev,
-        { name: res.name, message: res.message, currentVideo: res.currentVideo }];
-    });
-  };
-
   useEffect(() => {
     const pusherClinet = new Pusher('3006004164fdcfb53231', {
       cluster: 'ap1',
       forceTLS: true,
     });
+    const handlerMessage = (res: CallbackMessage) => {
+      setMessageSocket((prev) => {
+        const newprev = prev || [];
+        return [...newprev,
+          { name: res.name, message: res.message, currentVideo: res.currentVideo }];
+      });
+    };
     const handlerAction = (res: ActionType) => {
       setActionSocket((prev: ActionType[] | null) => {
         if (!prev) return null;
