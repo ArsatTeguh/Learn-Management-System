@@ -93,7 +93,7 @@ function VideoPage({
               }
               onClick={onProgress}
               type="button"
-              className=" disabled:bg-zinc-500 px-8 py-2 bg-sky-500 text-white font-medium rounded"
+              className=" disabled:bg-zinc-500 px-4 text-[13px] lg:text-md lg:px-8 py-2 bg-sky-500 text-white font-medium rounded"
             >
               Mark as complete
             </button>

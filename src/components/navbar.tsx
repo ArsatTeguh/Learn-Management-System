@@ -31,7 +31,7 @@ function Navbar({ token, list }: { token: string; list: any }) {
   const router = useRouter();
   return (
     <div className="w-full border-b-[1px] h-full bg-white">
-      <div className="flex w-full justify-between px-8 h-full items-center">
+      <div className="flex w-full justify-between lg:px-8 px-4 h-full items-center">
         <div className=" items-center gap-2 hidden md:flex ">
           <Image alt="logo" src="/logo.svg" width={150} height={150} />
         </div>
@@ -74,7 +74,7 @@ function Navbar({ token, list }: { token: string; list: any }) {
                 height={50}
                 className="rounded-full border-[1px]"
               />
-              <div className="">
+              <div className="hidden lg:block">
                 <p className="font-medium text-sm text-sky-blue-500">
                   {' '}
                   {user?.email}{' '}

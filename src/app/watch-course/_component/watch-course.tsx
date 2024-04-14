@@ -204,7 +204,6 @@ function WatchCourse({ courseId, userId }: Props) {
       channel.bind('behavior', (res: ActionType) => {
         handlerAction(res);
       });
-      console.log('render');
       return () => {
         channel.unbind('chat', handlerMessage);
         channel.unbind('behavior', handlerAction);

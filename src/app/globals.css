@@ -3,3 +3,7 @@
 @tailwind utilities;
 
 @import '@uploadthing/react/styles.css';
+
+body {
+  background-color: white;
+}

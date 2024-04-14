@@ -17,10 +17,10 @@ function CardCourse({ data, userId }: Props) {
     <div
       // eslint-disable-next-line no-underscore-dangle
       onClick={() => onPage(`/watch-course/${data._id}/${userId}`)}
-      className="card hover:bg-sky-100/50 lg:w-80 w-96 bg-base-100 shadow rounded-md cursor-pointer"
+      className="card hover:bg-sky-100/50 lg:w-80 w-[21rem] bg-base-100 shadow rounded-md cursor-pointer"
     >
       <figure>
-        <Image src={data.thumbnail} alt="thumbnail" width={600} height={600} className="w-full lg:h-[200px] object-cover" />
+        <Image src={data.thumbnail} alt="thumbnail" width={600} height={600} className=" lg:h-[200px] object-cover w-full" />
       </figure>
       <div className="flex flex-col gap-3 px-3 py-3">
         <p className="text-lg font-semibold">{data.title}</p>
