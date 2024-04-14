@@ -8,7 +8,7 @@ import Toast from '@/lib/toast';
 import CustomeFetch from '@/lib/customeFetch';
 import calculateProgress from '@/lib/calculateProgress';
 import Pusher from 'pusher-js';
-import { FetchSocket, pusherClient } from '@/lib/fetchSocket';
+import { FetchSocket } from '@/lib/fetchSocket';
 import SidebarChapter from './sidebar';
 import VideoPage from './videoPage';
 import Message from './message';
@@ -28,10 +28,7 @@ function WatchCourse({ courseId, userId }: Props) {
   const [messageSocket, setMessageSocket] = useState<Array<MessageType> | null >(null);
   const [progressSocket, setProgressSocket] = useState<ProgressType | null>(null);
   const { Fetch } = CustomeFetch();
-  const pusherClinet = new Pusher('3006004164fdcfb53231', {
-    cluster: 'ap1',
-    forceTLS: true,
-  });
+
   const { data } = useSWR(`${process.env.NEXT_PUBLIC_API_URL}/api/chapter/${courseId}/${userId}`, fetcher, {
     onSuccess: () => {
       Toast({
@@ -88,6 +85,7 @@ function WatchCourse({ courseId, userId }: Props) {
         courseId,
         chapterId,
       };
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const res = await updateProgress(`${process.env.NEXT_PUBLIC_API_URL}/api/chapter/progress`, dataProgress);
       setProgressSocket((prev) => {
         const newprev = prev ?? { count: 0, chapter: [] };
@@ -124,6 +122,7 @@ function WatchCourse({ courseId, userId }: Props) {
       dislike,
       name,
     };
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const req = {
       courseId,
       chapterId: currentVideo,
@@ -133,7 +132,7 @@ function WatchCourse({ courseId, userId }: Props) {
       await FetchSocket({ url: 'message', body: { name, message, currentVideo: chapterId } });
     } else {
       const currenAction = actionSocket?.filter((item: ActionType) => item.id === currentVideo);
-      FetchSocket({
+      await FetchSocket({
         url: 'action',
         body:
         {
@@ -183,6 +182,10 @@ function WatchCourse({ courseId, userId }: Props) {
   };
 
   useEffect(() => {
+    const pusherClinet = new Pusher('3006004164fdcfb53231', {
+      cluster: 'ap1',
+      forceTLS: true,
+    });
     const handlerAction = (res: ActionType) => {
       setActionSocket((prev: ActionType[] | null) => {
         if (!prev) return null;
@@ -210,7 +213,7 @@ function WatchCourse({ courseId, userId }: Props) {
         pusherClinet.unsubscribe(chapterId);
       };
     }
-  }, [chapterId, currentVideo, pusherClinet]);
+  }, [chapterId, currentVideo]);
 
   return (
     <div>
