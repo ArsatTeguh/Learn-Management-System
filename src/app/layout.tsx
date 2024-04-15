@@ -3,7 +3,6 @@ import type { Metadata } from 'next';
 import './globals.css';
 import 'react-toastify/dist/ReactToastify.css';
 import { Poppins } from 'next/font/google';
-import Footer from '@/components/footer';
 import { ToastContainer } from 'react-toastify';
 import CustomProvider from '@/state/customeProvider';
 import PageNavbar from '@/components/pageNavbar';
@@ -39,9 +38,6 @@ export default function RootLayout({
           {/* letakan CustomProvider disini jika ingin menggunakan redux-toolkit */}
           {children}
         </CustomProvider>
-        {/* <div className="w-full">
-          <Footer />
-        </div> */}
         <ToastContainer />
       </body>
     </html>
