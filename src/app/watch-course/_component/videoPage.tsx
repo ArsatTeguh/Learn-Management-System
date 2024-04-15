@@ -41,21 +41,21 @@ function VideoPage({
           </p>
         </span>
       ) : (
-        <div className="aspect-video text-white text-center rounded">
+        <div className="aspect-video text-white text-center rounded !z-0">
           <MuxPlayer
             playbackId={video.chapter_course[currentVideo].playbackId}
           />
         </div>
       )}
-      <div className="flex items-center justify-between py-2 border-b-2">
-        <div className="flex flex-col gap-2">
-          <p className="font-medium text-xl text-zinc-800">
+      <div className="flex flex-col lg:flex-row gap-6 lg:gap-0 lg:items-center justify-between py-2 border-b-2">
+        <div className="flex flex-col gap-2 ">
+          <p className="font-medium text-lg lg:text-xl text-zinc-800">
             {' '}
             {video.chapter_course[currentVideo].chapter}{' '}
           </p>
           <div className="flex items-center gap-6 text-lg">
             <span
-              className={`${action && action[0]?.like?.includes(userId) && 'text-sky-600'} flex items-center text-xl gap-2 font-medium cursor-pointer`}
+              className={`${action && action[0]?.like?.includes(userId) && 'text-sky-600'} flex items-center text-xl gap-2 font-medium cursor-pointer text-zinc-800`}
               onClick={() => onAction({
                 message: '', like: true, dislike: false, name: '',
               })}
@@ -64,7 +64,7 @@ function VideoPage({
               <span className="text-sm">{(action && action[0]?.like?.length) ?? 0}</span>
             </span>
             <span
-              className={`${action && action[0]?.dislike?.includes(userId) && 'text-red-600'} flex text-xl items-center gap-2 font-medium cursor-pointer`}
+              className={`${action && action[0]?.dislike?.includes(userId) && 'text-red-600'} flex text-xl items-center gap-2 font-medium cursor-pointer text-zinc-800`}
               onClick={() => onAction({
                 message: '', like: false, dislike: true, name: '',
               })}
@@ -93,14 +93,14 @@ function VideoPage({
               }
               onClick={onProgress}
               type="button"
-              className=" disabled:bg-zinc-500 px-4 text-[13px] lg:text-md lg:px-8 py-2 bg-sky-500 text-white font-medium rounded"
+              className=" disabled:bg-zinc-500 px-4 text-sm lg:px-8 py-2 bg-sky-500 text-white font-medium rounded"
             >
               Mark as complete
             </button>
           </div>
         )}
       </div>
-      <p className="text-sm mt-2 text-zinc-600">
+      <p className=" text-[13px] lg:text-sm lg:mt-2 mt-4 text-zinc-600">
         {video?.chapter_course[currentVideo].capter_desc}
       </p>
     </div>

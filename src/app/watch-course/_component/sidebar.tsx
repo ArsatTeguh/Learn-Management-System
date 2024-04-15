@@ -11,12 +11,15 @@ interface Props {
   }>;
   currentVideo: number;
   onCurrentVideo: (e: number) => void;
+  isMobile: boolean
 }
 
-function SidebarChapter({ list, currentVideo, onCurrentVideo }: Props) {
+function SidebarChapter({
+  list, currentVideo, onCurrentVideo, isMobile,
+}: Props) {
   return (
     <div className=" h-full">
-      <div className="h-screen overflow-y-hidden py-4 bg-white w-64">
+      <div className={`${!isMobile ? 'h-screen overflow-y-hidden py-4 bg-white w-64' : ''}`}>
         {!list ? (
           <Loadingsidebar />
         ) : (

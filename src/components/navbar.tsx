@@ -30,7 +30,7 @@ function Navbar({ token, list }: { token: string; list: any }) {
 
   const router = useRouter();
   return (
-    <div className="w-full border-b-[1px] h-full bg-white">
+    <div className="w-full border-b-[1px] h-full bg-white z-10">
       <div className="flex w-full justify-between lg:px-8 px-4 h-full items-center">
         <div className=" items-center gap-2 hidden md:flex ">
           <Image alt="logo" src="/logo.svg" width={150} height={150} />

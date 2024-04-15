@@ -226,6 +226,7 @@ function WatchCourse({ courseId, userId }: Props) {
         )}
         <Suspense fallback="">
           <SidebarChapter
+            isMobile={false}
             currentVideo={currentVideo}
             onCurrentVideo={onCurrentVideo}
             list={data?.course?.chapter_course}
@@ -253,13 +254,27 @@ function WatchCourse({ courseId, userId }: Props) {
               </Suspense>
             )}
           </div>
+          <div className="mt-4 block lg:hidden bg-slate-300/20 rounded-md w-full mx-auto py-4">
+            <SidebarChapter
+              isMobile
+              currentVideo={currentVideo}
+              onCurrentVideo={onCurrentVideo}
+              list={data?.course?.chapter_course}
+            />
+          </div>
           <div className="lg:col-span-1 pt-4  h-full w-full relative">
             <div className="bg-slate-300/20 p-4">
-              <p className="font-semibold text-lg">Comment</p>
+              <p className="font-semibold text-lg text-zinc-800">Comment</p>
               <span className="block w-[50%] h-[2px] bg-zinc-400 rounded-full" />
               <span className="block w-[25%] h-[2px] mt-1 bg-zinc-400 rounded-full" />
             </div>
-            <div className="flex flex-col  gap-4 w-full bg-slate-300/20 p-4 rounded-md max-h-[50%] overflow-y-auto">
+            <div className="flex flex-col gap-4 w-full bg-slate-300/20 p-4 rounded-md max-h-[50%] overflow-y-auto">
+              {(data?.course?.chapter_course[currentVideo]?.comment.length <= 0
+              && messageSocket === null) && (
+                <div>
+                  <p className="text-center text-zinc-500 text-sm">No comments yet</p>
+                </div>
+              )}
               {data?.course?.chapter_course[currentVideo]
                 ?.comment?.map((item: any, index: number) => (
                   // eslint-disable-next-line react/no-array-index-key
