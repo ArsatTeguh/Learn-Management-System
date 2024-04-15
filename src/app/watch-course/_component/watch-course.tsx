@@ -9,6 +9,7 @@ import CustomeFetch from '@/lib/customeFetch';
 import calculateProgress from '@/lib/calculateProgress';
 import Pusher from 'pusher-js';
 import { FetchSocket } from '@/lib/fetchSocket';
+import { CalculateAction } from '@/lib/calculateaAction';
 import SidebarChapter from './sidebar';
 import VideoPage from './videoPage';
 import Message from './message';
@@ -122,21 +123,23 @@ function WatchCourse({ courseId, userId }: Props) {
       data: requestAction,
     };
     if (message.trim() !== '') {
-      await FetchSocket({ url: 'message', body: { name, message, currentVideo: chapterId } });
+      FetchSocket({ url: 'message', body: { name, message, currentVideo: chapterId } });
     } else {
       const currenAction = actionSocket?.filter((item: ActionType) => item.id === currentVideo);
-      await FetchSocket({
-        url: 'action',
-        body:
-        {
-          message,
-          like,
-          dislike,
-          actionSocket: currenAction ? currenAction[0] : {},
-          user: userId,
-          currentVideo: chapterId,
-          index: currentVideo,
-        },
+      const newAction = CalculateAction({
+        actionSocket: currenAction ? currenAction[0] : {},
+        user: userId,
+        like,
+        dislike,
+      });
+      setActionSocket((prev: any) => {
+        if (!prev) return null;
+        return prev.map((item: any) => {
+          if (item.id === currentVideo) {
+            return newAction;
+          }
+          return item;
+        });
       });
     }
     // Fetch({ url: 'api/chapter/message', method: 'POST', body: req }).then((res) => {
@@ -177,29 +180,14 @@ function WatchCourse({ courseId, userId }: Props) {
           { name: res.name, message: res.message, currentVideo: res.currentVideo }];
       });
     };
-    const handlerAction = (res: ActionType) => {
-      setActionSocket((prev: ActionType[] | null) => {
-        if (!prev) return null;
-        return prev.map((item) => {
-          if (item.id === currentVideo) {
-            return res;
-          }
-          return item;
-        });
-      });
-    };
     let channel: any;
     if (chapterId) {
       channel = pusherClinet.subscribe(chapterId);
       channel.bind('chat', (res: CallbackMessage) => {
         handlerMessage(res);
       });
-      channel.bind('behavior', (res: ActionType) => {
-        handlerAction(res);
-      });
       return () => {
         channel.unbind('chat', handlerMessage);
-        channel.unbind('behavior', handlerAction);
         pusherClinet.unsubscribe(chapterId);
       };
     }

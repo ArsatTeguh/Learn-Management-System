@@ -55,7 +55,7 @@ function VideoPage({
           </p>
           <div className="flex items-center gap-6 text-lg">
             <span
-              className={`${action && action[0]?.like?.includes(userId) && 'text-sky-600'} flex items-center text-xl gap-2 font-medium cursor-pointer text-zinc-800`}
+              className={`${action && action[0]?.like?.includes(userId) ? 'text-sky-600' : 'text-zinc-800'} flex items-center text-xl gap-2 font-medium cursor-pointer `}
               onClick={() => onAction({
                 message: '', like: true, dislike: false, name: '',
               })}
@@ -64,7 +64,7 @@ function VideoPage({
               <span className="text-sm">{(action && action[0]?.like?.length) ?? 0}</span>
             </span>
             <span
-              className={`${action && action[0]?.dislike?.includes(userId) && 'text-red-600'} flex text-xl items-center gap-2 font-medium cursor-pointer text-zinc-800`}
+              className={`${action && action[0]?.dislike?.includes(userId) ? 'text-red-600' : 'text-zinc-800'} flex text-xl items-center gap-2 font-medium cursor-pointer `}
               onClick={() => onAction({
                 message: '', like: false, dislike: true, name: '',
               })}
