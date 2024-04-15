@@ -66,8 +66,8 @@ function Sidebar({ list } : { list: ListProps[] }) {
   }, [modal.isModal]);
 
   return (
-    <div className=" h-full">
-      <div className="h-screen overflow-y-hidden  bg-white border-r-[1px] w-64">
+    <div className=" h-full relative ">
+      <div className="h-screen overflow-y-hidden bg-white border-r-[1px] w-64">
         <div className="flex flex-col gap-2 px-3 pt-4">
           {list?.map((item, index: number) => (
             // eslint-disable-next-line react/no-array-index-key
@@ -80,6 +80,13 @@ function Sidebar({ list } : { list: ListProps[] }) {
               navigate={onNavigate}
             />
           ))}
+        </div>
+        <div className=" rounded  mt-4 w-full  absolute bottom-[5rem]  lg:bottom-[10rem]">
+          <div className=" flex flex-col w-[92%] mx-auto gap-2  p-4 bg-white rounded border">
+            <p className="font-medium">Upgrade to Pro</p>
+            <p className="text-[13px] text-zinc-600"> Unlock weekly workshops, access to all paid content, and more.</p>
+            <button type="submit" className="bg-slate-800 text-sm rounded mt-2 text-white font-medium px-6 py-2">Upgrade</button>
+          </div>
         </div>
       </div>
     </div>

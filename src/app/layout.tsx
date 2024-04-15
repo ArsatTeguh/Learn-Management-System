@@ -39,9 +39,9 @@ export default function RootLayout({
           {/* letakan CustomProvider disini jika ingin menggunakan redux-toolkit */}
           {children}
         </CustomProvider>
-        <div className="w-full">
+        {/* <div className="w-full">
           <Footer />
-        </div>
+        </div> */}
         <ToastContainer />
       </body>
     </html>

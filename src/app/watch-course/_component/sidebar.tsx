@@ -23,7 +23,7 @@ function SidebarChapter({
         {!list ? (
           <Loadingsidebar />
         ) : (
-          <div className="flex flex-col gap-2  ">
+          <div className="flex flex-col gap-3">
             {list?.map((item, index: number) => (
               <Itemsidebar
                 key={item.asset_id}

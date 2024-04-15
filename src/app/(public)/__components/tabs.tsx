@@ -35,7 +35,7 @@ function Tabs({ onparams, params }: { onparams: (props: string) => void, params 
           onClick={() => onparams(item.params)}
           key={item.name}
           type="button"
-          className={`px-4 hover:bg-zinc-500/20 rounded-md  text-xs py-2 font-medium transition-all  ${params === item.params ? 'bg-sky-300/20  text-sky-700' : 'bg-slate-300/20'}`}
+          className={`px-4 hover:bg-zinc-500/20 rounded-md  text-xs py-2 font-medium transition-all  ${params === item.params ? 'bg-sky-300/20  text-sky-700' : 'bg-slate-300/20 text-zinc-500'}`}
         >
           {item.name}
         </button>
