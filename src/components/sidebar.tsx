@@ -81,7 +81,7 @@ function Sidebar({ list } : { list: ListProps[] }) {
             />
           ))}
         </div>
-        <div className=" rounded  mt-4 w-full  absolute bottom-[5rem]  lg:bottom-[10rem]">
+        <div className=" rounded  mt-4 w-full  absolute bottom-[11rem]  lg:bottom-[10rem]">
           <div className=" flex flex-col w-[92%] mx-auto gap-2  p-4 bg-white rounded border">
             <p className="font-medium">Upgrade to Pro</p>
             <p className="text-[13px] text-zinc-600"> Unlock weekly workshops, access to all paid content, and more.</p>

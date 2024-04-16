@@ -6,7 +6,7 @@ function LoadingCard() {
       // eslint-disable-next-line no-underscore-dangle
       className="card  lg:w-80 w-[21rem] bg-white"
     >
-      <span className="block lg:h-[200px] w-full skeleton" />
+      <span className="block lg:h-[200px] h-[150px] w-full skeleton" />
       <div className="flex flex-col gap-3 px-3 py-3">
         <span className="h-5 w-40 rounded-full block bg-zinc-200" />
         <div className="flex items-center gap-2 w-full">
