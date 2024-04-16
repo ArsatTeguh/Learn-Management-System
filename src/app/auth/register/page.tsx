@@ -49,7 +49,7 @@ function SignOut() {
     }
   };
   return (
-    <div className="lg:w-1/3 w-full py-28 mx-auto px-6 ">
+    <div className="lg:w-1/3 w-full py-28 mx-auto px-6 bg-white  ">
       <p className="text-xl font-medium">Create Your Acount</p>
       <form
         action=""
@@ -59,7 +59,7 @@ function SignOut() {
         <label
           aria-label="email"
           htmlFor="email"
-          className="input border-zinc-500 input-bordered flex items-center gap-2"
+          className="input border-zinc-500 bg-white  input-bordered flex items-center gap-2"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -72,7 +72,7 @@ function SignOut() {
           </svg>
           <input
             type="email"
-            className="grow "
+            className="grow bg-white "
             placeholder="Email"
             {...register('email', {
               required: 'Email not be empty !',
@@ -91,7 +91,7 @@ function SignOut() {
         <label
           aria-label="password"
           htmlFor="password"
-          className="input  input-bordered flex items-center gap-2"
+          className="input  input-bordered flex items-center gap-2 bg-white "
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -108,7 +108,7 @@ function SignOut() {
           <input
             id="password"
             type="password"
-            className="grow "
+            className="grow bg-white "
             placeholder="Password"
             {...register('password', {
               required: 'Password not be empty !',
@@ -126,7 +126,7 @@ function SignOut() {
         <label
           aria-label="repeatPassword"
           htmlFor="repeatPassword"
-          className="input  input-bordered flex items-center gap-2"
+          className="input  input-bordered bg-white  flex items-center gap-2"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -143,7 +143,7 @@ function SignOut() {
           <input
             id="repeatPassword"
             type="password"
-            className="grow "
+            className="grow bg-white "
             placeholder="repeatPassword"
             {...register('repeatPassword', {
               required: 'repeatPassword not be empty !',

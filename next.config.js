@@ -4,7 +4,7 @@ const nextConfig = {
   optimizeFonts: false, // Disable font optimization
   output: 'standalone',
   images: {
-    unoptimized: true,
+    domains: ['utfs.io', 'files.edgestore.dev'],
   },
 };
   

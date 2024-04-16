@@ -1,23 +1,31 @@
+'use client';
+
 import React from 'react';
+import useSWR from 'swr';
+import { useSearchParams } from 'next/navigation';
+import { fetcher } from '@/app/watch-course/_component/typeData';
 import CardCourse from './cardCourse';
+import LoadingCard from './loadingCard';
 
-async function PageCourse({ userId } : { userId: string }) {
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/courseAll`,
-    { cache: 'no-store' },
-  );
-  const { data } = await response.json();
-
+function PageCourse({ userId } : { userId: string }) {
+  const searchParams = useSearchParams();
+  const category = searchParams.get('category');
+  // const title = searchParams.get('title');
+  const { data, isLoading } = useSWR(`${process.env.NEXT_PUBLIC_API_URL}/api/courseAll/?category=${category ?? ''}`, fetcher);
   return (
     <div>
-      {data ? (
+      {!isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 px-4 lg:grid-cols-3 gap-4 py-8 place-items-center">
-          {data.data.map((item: any) => (
+          {data.map((item: any) => (
             <CardCourse data={item} key={item.title} userId={userId} />
           ))}
         </div>
       ) : (
-        <p>loading</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 px-4 lg:grid-cols-3 gap-4 py-8 place-items-center">
+          <LoadingCard />
+          <LoadingCard />
+          <LoadingCard />
+        </div>
       )}
     </div>
   );

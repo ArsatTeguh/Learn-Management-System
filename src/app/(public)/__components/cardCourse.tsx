@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import React from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { IoBookOutline } from 'react-icons/io5';
 
@@ -11,6 +11,7 @@ type Props = {
 };
 
 function CardCourse({ data, userId }: Props) {
+  const [loading, setLoading] = useState(true);
   const route = useRouter();
   const onPage = (url: string) => route.push(url);
   return (
@@ -20,7 +21,7 @@ function CardCourse({ data, userId }: Props) {
       className="card hover:bg-sky-100/50 lg:w-80 w-[21rem] bg-white shadow rounded-md cursor-pointer"
     >
       <figure>
-        <Image src={data.thumbnail} alt="thumbnail" width={600} height={600} className=" lg:h-[200px] object-cover w-full" />
+        <Image src={data.thumbnail} alt="thumbnail" width={600} height={600} className={`lg:h-[200px] object-cover w-full transition-all duration-300 ${loading ? 'scale-110 blur-2xl grayscale' : 'scale-100 blur-0 grayscale-0'}`} onLoadingComplete={() => setLoading(false)} />
       </figure>
       <div className="flex flex-col gap-3 px-3 py-3">
         <p className="text-lg font-semibold">{data.title}</p>

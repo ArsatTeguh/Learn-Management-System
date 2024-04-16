@@ -49,7 +49,7 @@ function SignIn() {
   };
 
   return (
-    <div className="lg:w-1/3 w-full py-28 mx-auto px-6 ">
+    <div className="lg:w-1/3 w-full py-28 mx-auto px-6 bg-white">
       <p className="text-xl font-medium">Login Your Acount</p>
       <form
         action=""
@@ -59,7 +59,7 @@ function SignIn() {
         <label
           aria-label="email"
           htmlFor="email"
-          className="input border-zinc-500 input-bordered flex items-center gap-2"
+          className="input border-zinc-500 input-bordered bg-white flex items-center gap-2"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -72,7 +72,7 @@ function SignIn() {
           </svg>
           <input
             type="email"
-            className="grow "
+            className="grow bg-white"
             placeholder="Email"
             {...register('email', {
               required: 'Email not be empty !',
@@ -91,7 +91,7 @@ function SignIn() {
         <label
           aria-label="password"
           htmlFor="password"
-          className="input  input-bordered flex items-center gap-2"
+          className="input bg-white  input-bordered flex items-center gap-2"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -108,7 +108,7 @@ function SignIn() {
           <input
             id="password"
             type="password"
-            className="grow "
+            className="grow bg-white"
             placeholder="Password"
             {...register('password', {
               required: 'Password not be empty !',

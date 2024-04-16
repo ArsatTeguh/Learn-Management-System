@@ -2,7 +2,7 @@ import connectMongoDB from '@/lib/connectDb';
 import verifyToken from '@/lib/jsonwebtoken';
 import CourseModel from '@/models/course';
 import Mux from '@mux/mux-node';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 const utilsChapter = {
   action: {
@@ -80,12 +80,26 @@ export async function POST(request: Request | any) {
   }
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  // eslint-disable-next-line prefer-const
+  let searchCriteria: any = {};
   try {
     await connectMongoDB();
-    const data = await CourseModel.find();
+
+    const { searchParams } = request.nextUrl;
+    const category = searchParams.get('category');
+    const title = searchParams.get('title');
+
+    if (category) {
+      searchCriteria.category = { $regex: category, $options: 'i' };
+    }
+    if (title) {
+      searchCriteria.title = { $regex: title, $options: 'i' };
+    }
+
+    const data = await CourseModel.find(searchCriteria);
     return NextResponse.json(
-      { message: 'Success Get All Course', data: { data } },
+      { message: 'Success Get All Course', data },
       { status: 200 },
     );
   } catch (error: any) {
