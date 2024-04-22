@@ -115,11 +115,8 @@ function WatchCourse({ courseId, userId }: Props) {
       chapterId: currentVideo,
       data: requestAction,
     };
-    const res = await Fetch({ url: 'api/chapter/message', method: 'POST', body: req });
     if (message.trim() !== '') {
-      if (res.status === 200) {
-        FetchSocket({ url: 'message', body: { name, message, currentVideo: chapterId } });
-      }
+      FetchSocket({ url: 'message', body: { name, message, currentVideo: chapterId } });
     } else {
       const currenAction = actionSocket?.filter((item: ActionType) => item.id === currentVideo);
       const newAction = CalculateAction({
@@ -138,6 +135,7 @@ function WatchCourse({ courseId, userId }: Props) {
         });
       });
     }
+    await Fetch({ url: 'api/chapter/message', method: 'POST', body: req });
   };
 
   const onCalculate = () => calculateProgress(

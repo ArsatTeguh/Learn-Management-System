@@ -89,7 +89,7 @@ function VideoPage({
           <div className="">
             <button
               disabled={
-                progressSocket.chapter?.includes(video?.chapter_course[currentVideo].asset_id)
+                progressSocket?.chapter?.includes(video?.chapter_course[currentVideo].asset_id)
               }
               onClick={onProgress}
               type="button"
