@@ -74,29 +74,22 @@ function WatchCourse({ courseId, userId }: Props) {
   };
 
   const onProgress = async () => {
-    if (userId) {
+    if (userId && data?.progress?.length > 0) {
       const dataProgress = {
         courseId,
         chapterId,
       };
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const res = await updateProgress(`${process.env.NEXT_PUBLIC_API_URL}/api/chapter/progress`, dataProgress);
-      setProgressSocket((prev) => {
-        const newprev = prev ?? { count: 0, chapter: [] };
-        return {
-          count: newprev.count,
-          chapter: [...newprev.chapter, chapterId],
-        };
-      });
-      // if (res.status === 200) {
-      //   setProgressSocket((prev) => {
-      //     const newprev = prev ?? { count: 0, chapter: [] };
-      //     return {
-      //       count: newprev.count,
-      //       chapter: [...newprev.chapter, chapterId],
-      //     };
-      //   });
-      // }
+      if (res.status === 200) {
+        setProgressSocket((prev) => {
+          const newprev = prev ?? { count: 0, chapter: [] };
+          return {
+            count: newprev.count,
+            chapter: [...newprev.chapter, chapterId],
+          };
+        });
+      }
     }
     // eslint-disable-next-line no-unsafe-optional-chaining
     if (currentVideo < data?.course?.chapter_course.length - 1) {
@@ -122,8 +115,11 @@ function WatchCourse({ courseId, userId }: Props) {
       chapterId: currentVideo,
       data: requestAction,
     };
+    const res = await Fetch({ url: 'api/chapter/message', method: 'POST', body: req });
     if (message.trim() !== '') {
-      FetchSocket({ url: 'message', body: { name, message, currentVideo: chapterId } });
+      if (res.status === 200) {
+        FetchSocket({ url: 'message', body: { name, message, currentVideo: chapterId } });
+      }
     } else {
       const currenAction = actionSocket?.filter((item: ActionType) => item.id === currentVideo);
       const newAction = CalculateAction({
@@ -142,9 +138,6 @@ function WatchCourse({ courseId, userId }: Props) {
         });
       });
     }
-    // Fetch({ url: 'api/chapter/message', method: 'POST', body: req }).then((res) => {
-
-    // });
   };
 
   const onCalculate = () => calculateProgress(
