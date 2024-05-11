@@ -42,13 +42,14 @@ function InputImage({
               <p className="flex items-center text-white justify-center font-medium">Video Success Upload</p>
             </div>
           ) : (
-            <div className=" bg-slate-100 p-2 ">
+            <div className=" bg-slate-100 p-2 rounded ">
               <FileUpload
                 onChange={(url) => {
                   if (url) setSelectedMedia(id, 'videoUrl', url);
                 }}
                 endpoint="chapterVideo"
               />
+              <p className="text-sm text-sky-600 mt-2 font-medium">According to MUX regulations, videos cannot exceed 10 seconds</p>
             </div>
           )}
         </div>

@@ -96,15 +96,16 @@ function Navbar({ token, list }: { token: string; list: any }) {
               <span className="text-xl">
                 <PiSignOut />
               </span>
-              Login
+              Demo
             </button>
-            <button
+            {/* <button
               onClick={() => router.push('/auth/register')}
               type="button"
-              className=" px-6 py-2 hover:bg-sky-500/15 bg-sky-500 text-white border rounded-md flex items-center gap-2 hover:bg-sky-600"
+              className=" px-6 py-2 hover:bg-sky-500/15 bg-sky-500 text-white border
+              rounded-md flex items-center gap-2 hover:bg-sky-600"
             >
               Register
-            </button>
+            </button> */}
           </div>
         )}
       </div>

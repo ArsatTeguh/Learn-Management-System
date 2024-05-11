@@ -142,6 +142,11 @@ function SignIn() {
           </p>
         </Link>
       </div>
+      <div className="bg-slate-300/20 font-medium p-4 mt-2 rounded text-zinc-700 text-sm">
+        <p className="text-center mb-2 ">Access Acount</p>
+        <p>User : user@gmail.com - arsat123</p>
+        <p>Teacher : konstadev@gmail.com - arsat123</p>
+      </div>
     </div>
   );
 }
