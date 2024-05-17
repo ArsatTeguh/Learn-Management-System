@@ -14,7 +14,8 @@ const poppins = Poppins({
 
 export const metadata: Metadata = {
   title: 'Learn Magement System',
-  description: 'website for students to start the newest and most complete lessons.',
+  description:
+    'website for students to start the newest and most complete lessons.',
 };
 
 export default function RootLayout({
@@ -29,7 +30,7 @@ export default function RootLayout({
       </head>
       <body className={poppins.className}>
         <CustomProvider>
-          <div className="w-screen !z-10 fixed h-20 bg-white overflow-x-hidden ">
+          <div className="w-screen !z-30 fixed h-20 bg-white overflow-x-hidden ">
             <Suspense fallback="">
               <PageNavbar />
               {/* <Navbar /> */}

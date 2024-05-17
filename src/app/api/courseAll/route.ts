@@ -91,7 +91,10 @@ export async function GET(request: NextRequest) {
     const title = searchParams.get('title');
 
     if (category) {
-      searchCriteria.category = { $regex: category.replace(/-/g, ' '), $options: 'i' };
+      searchCriteria.category = {
+        $regex: category.replace(/-/g, ' '),
+        $options: 'i',
+      };
     }
     if (title) {
       searchCriteria.title = { $regex: title, $options: 'i' };

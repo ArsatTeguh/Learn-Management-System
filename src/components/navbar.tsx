@@ -8,10 +8,10 @@ import { setUser } from '@/state/userSlice';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { GiHamburgerMenu } from 'react-icons/gi';
-import { IoSearchOutline } from 'react-icons/io5';
 import { PiSignOut } from 'react-icons/pi';
 import { useDispatch, useSelector } from 'react-redux';
 import Sidebar from './sidebar';
+import Search from './search';
 
 export type UserProps = {
   profile: string;
@@ -22,6 +22,7 @@ export type UserProps = {
 function Navbar({ token, list }: { token: string; list: any }) {
   const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.user);
+
   useEffect(() => {
     const information = getToken({ token });
     dispatch(setUser(information as UserProps));
@@ -30,7 +31,7 @@ function Navbar({ token, list }: { token: string; list: any }) {
 
   const router = useRouter();
   return (
-    <div className="w-full border-b-[1px] h-full bg-white z-10">
+    <div className="w-full border-b-[1px] h-full  bg-white z-10 ">
       <div className="flex w-full justify-between lg:px-8 px-4 h-full items-center">
         <div className=" items-center gap-2 hidden md:flex ">
           <Image alt="logo" src="/logo.svg" width={150} height={150} />
@@ -54,15 +55,8 @@ function Navbar({ token, list }: { token: string; list: any }) {
             <Sidebar list={list} />
           </div>
         </div>
-        <div className="w-[45%] relative hidden md:block">
-          <input
-            type="text"
-            placeholder="Search"
-            className="rounded-md border-[1px] outline-none border-zinc-200  w-full pl-4 py-2"
-          />
-          <span className="absolute right-3 top-[.6rem] text-2xl text-zinc-500">
-            <IoSearchOutline />
-          </span>
+        <div className="w-[45%] hidden md:block h-full ">
+          <Search userId={user.userId} />
         </div>
         {token ? (
           <div className="items-center gap-2 px-2 flex ">

@@ -33,8 +33,9 @@ function CardCourse({ data, userId }: Props) {
             {data.length_chapter} Chapters
           </p>
         </div>
-        <p className="text-zinc-800 font-medium ">
-          {data.isFree ? 'Free' : `Rp.${data.price}`}
+        <p className={`${data.buyer_id.includes(userId) ? 'text-sky-600' : 'text-zinc-800'}  font-medium `}>
+          {/* eslint-disable-next-line no-nested-ternary */}
+          {data.isFree ? 'Free' : (data.buyer_id.includes(userId) ? 'Owned' : `Rp.${data.price}`)}
         </p>
       </div>
     </div>

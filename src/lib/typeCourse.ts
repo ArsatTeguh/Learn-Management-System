@@ -43,3 +43,15 @@ export interface Progress {
   progress: number;
   __v: number;
 }
+
+export interface CourseById {
+  isLock: boolean;
+  title: string;
+  thumbnail: string;
+  description: string;
+  players: number;
+  videoUrl: string;
+  price: number;
+  client_id: string | null;
+  courseId: string;
+}

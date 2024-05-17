@@ -8,3 +8,12 @@ body {
   background-color: white;
   color: rgb(12, 12, 12);
 }
+
+.linier {
+  background-image: linear-gradient(
+    to bottom,
+    #20202075 0%,
+    #272627e1 99%,
+    #1f1e1efa 50%
+  );
+}
