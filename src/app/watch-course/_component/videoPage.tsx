@@ -44,7 +44,9 @@ function VideoPage({
         <div className="aspect-video text-white rounded !z-0">
           <p className="text-sm bg-slate-300/20 text-zinc-700 p-2 rounded mb-2 font-medium">According to MUX regulations, videos cannot exceed 10 seconds and only last 1 day </p>
           <MuxPlayer
-            playbackId={video.chapter_course[currentVideo].playbackId}
+            maxResolution="720p"
+            metadata-video-title={video.capter_desc}
+            playbackId={video.chapter_course[currentVideo].playbackI}
           />
         </div>
       )}
