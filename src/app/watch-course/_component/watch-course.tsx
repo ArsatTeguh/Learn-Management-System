@@ -241,13 +241,14 @@ function WatchCourse({ courseId, userId }: Props) {
               list={data?.course?.chapter_course}
             />
           </div>
-          <div className="lg:col-span-1 pt-4  h-full w-full relative">
-            <div className="bg-slate-300/20 p-4">
-              <p className="font-semibold text-lg text-zinc-800">Comment</p>
-              <span className="block w-[50%] h-[2px] bg-zinc-400 rounded-full" />
-              <span className="block w-[25%] h-[2px] mt-1 bg-zinc-400 rounded-full" />
-            </div>
-            <div className="flex flex-col gap-4 w-full bg-slate-300/20 p-4 rounded-md max-h-[50%] overflow-y-auto">
+          <div className="lg:col-span-1 pt-4  p-2 h-full w-full relative">
+       
+            <div className="bg-slate-300/20 p-4 rounded ">
+              <p className="font-medium text-lg text-zinc-800">Comment</p>
+
+    
+            <Message onAction={onAction} />
+            <div className="flex flex-col gap-4 w-full   p-4 rounded-md max-h-[50%] overflow-y-auto">
               {(data?.course?.chapter_course[currentVideo]?.comment.length <= 0
               && messageSocket === null) && (
                 <div>
@@ -278,7 +279,7 @@ function WatchCourse({ courseId, userId }: Props) {
                   </div>
                 ))}
             </div>
-            <Message onAction={onAction} />
+            </div>
           </div>
         </div>
       </div>

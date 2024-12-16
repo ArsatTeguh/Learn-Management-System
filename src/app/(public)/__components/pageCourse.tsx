@@ -10,6 +10,7 @@ import LoadingCard from './loadingCard';
 function PageCourse({ userId } : { userId: string }) {
   const searchParams = useSearchParams();
   const category = searchParams.get('category');
+    
   // const title = searchParams.get('title');
   const { data, isLoading } = useSWR(`${process.env.NEXT_PUBLIC_API_URL}/api/courseAll/?category=${category ?? ''}`, fetcher);
   return (
