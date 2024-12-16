@@ -42,8 +42,9 @@ function WatchCourse({ courseId, userId }: Props) {
 
   const chapterId = data?.course?.chapter_course[currentVideo]?.asset_id;
   const checkout = async () => {
+    const d = new Date();
     const request = {
-      id: courseId,
+      id: courseId + d.getMinutes(),
       productName: data?.course?.title as string,
       price: data?.course?.price as number,
       quantity: 1,
@@ -236,7 +237,7 @@ function WatchCourse({ courseId, userId }: Props) {
               list={data?.course?.chapter_course}
             />
           </div>
-          <div className="lg:col-span-1 pt-4  lg:p-2 pb-4 lg:pb-0 h-full w-full relative">
+          <div className="lg:col-span-1 pt-4 lg:pt-0  lg:p-2 pb-4 lg:pb-0 h-full w-full relative">
 
             <div className=" lg:p-4 rounded ">
               <Message onAction={onAction} />
