@@ -242,43 +242,41 @@ function WatchCourse({ courseId, userId }: Props) {
             />
           </div>
           <div className="lg:col-span-1 pt-4  p-2 h-full w-full relative">
-       
+
             <div className="bg-slate-300/20 p-4 rounded ">
               <p className="font-medium text-lg text-zinc-800">Comment</p>
-
-    
-            <Message onAction={onAction} />
-            <div className="flex flex-col gap-4 w-full   p-4 rounded-md max-h-[50%] overflow-y-auto">
-              {(data?.course?.chapter_course[currentVideo]?.comment.length <= 0
+              <Message onAction={onAction} />
+              <div className="flex flex-col gap-4 w-full   p-4 rounded-md max-h-[50%] overflow-y-auto">
+                {(data?.course?.chapter_course[currentVideo]?.comment.length <= 0
               && messageSocket === null) && (
                 <div>
                   <p className="text-center text-zinc-500 text-sm">No comments yet</p>
                 </div>
-              )}
-              {data?.course?.chapter_course[currentVideo]
-                ?.comment?.map((item: any, index: number) => (
+                )}
+                {data?.course?.chapter_course[currentVideo]
+                  ?.comment?.map((item: any, index: number) => (
                   // eslint-disable-next-line react/no-array-index-key
-                  <div key={index} className="border-b w-full">
-                    <p className="text-sm font-medium text-black">@{item?.user}</p>
-                    <p className="text-xs text-justify text-black">
-                      {item?.message}
-                    </p>
-                    <span className="w-full block bg-zinc-200 h-[1px] mt-1 rounded-full" />
-                  </div>
-                ))}
-              {messageSocket?.filter((item) => item.currentVideo
+                    <div key={index} className="border-b w-full">
+                      <p className="text-sm font-medium text-black">@{item?.user}</p>
+                      <p className="text-xs text-justify text-black">
+                        {item?.message}
+                      </p>
+                      <span className="w-full block bg-zinc-200 h-[1px] mt-1 rounded-full" />
+                    </div>
+                  ))}
+                {messageSocket?.filter((item) => item.currentVideo
               === chapterId)
-                .map((item, index: number) => (
+                  .map((item, index: number) => (
                   // eslint-disable-next-line react/no-array-index-key
-                  <div key={index} className="border-b w-full">
-                    <p className="text-sm font-medium text-black">@{item?.name}</p>
-                    <p className="text-xs text-justify text-black">
-                      {item?.message}
-                    </p>
-                    <span className="w-full block bg-zinc-200 h-[1px] mt-1 rounded-full" />
-                  </div>
-                ))}
-            </div>
+                    <div key={index} className="border-b w-full">
+                      <p className="text-sm font-medium text-black">@{item?.name}</p>
+                      <p className="text-xs text-justify text-black">
+                        {item?.message}
+                      </p>
+                      <span className="w-full block bg-zinc-200 h-[1px] mt-1 rounded-full" />
+                    </div>
+                  ))}
+              </div>
             </div>
           </div>
         </div>
