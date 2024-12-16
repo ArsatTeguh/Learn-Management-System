@@ -85,19 +85,17 @@ function WatchCourse({ courseId, userId }: Props) {
         courseId,
         chapterId,
       };
-
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const res = await updateProgress(`${process.env.NEXT_PUBLIC_API_URL}/api/chapter/progress`, dataProgress);
-      if (res.status === 200) {
-        setProgressSocket((prev) => {
-          const newprev = prev ?? { count: 0, chapter: [] };
-          return {
-            count: newprev.count,
-            chapter: [...newprev.chapter, chapterId],
-          };
-        });
-      }
+      await updateProgress(`${process.env.NEXT_PUBLIC_API_URL}/api/chapter/progress`, dataProgress);
     }
+
+    setProgressSocket((prev) => {
+      const newprev = !prev?.chapter ? { count: prev?.count!, chapter: [] } : prev;
+      return {
+        count: newprev.count,
+        chapter: [...newprev.chapter, chapterId],
+      };
+    });
     // eslint-disable-next-line no-unsafe-optional-chaining
     if (currentVideo < data?.course?.chapter_course.length - 1) {
       setCurrentVideo((prev) => prev + 1);
@@ -122,6 +120,7 @@ function WatchCourse({ courseId, userId }: Props) {
       chapterId: currentVideo,
       data: requestAction,
     };
+    await Fetch({ url: 'api/chapter/message', method: 'POST', body: req });
     if (message.trim() === '') {
       const currenAction = actionSocket?.filter((item: ActionType) => item.id === currentVideo);
       const newAction = CalculateAction({
@@ -147,13 +146,15 @@ function WatchCourse({ courseId, userId }: Props) {
         return [...prev, { currentVideo: chapterId, name, message }];
       });
     }
-    await Fetch({ url: 'api/chapter/message', method: 'POST', body: req });
   };
 
-  const onCalculate = () => calculateProgress(
-    progressSocket?.chapter?.length as number,
-    progressSocket?.count as number,
-  );
+  const onCalculate = () => {
+    const chapter = !progressSocket?.chapter ? 0 : progressSocket?.chapter?.length;
+    return calculateProgress(
+      chapter,
+      progressSocket?.count as number,
+    );
+  };
 
   const onCurrentVideo = (videoId: number) => {
     setCurrentVideo(videoId);
@@ -175,10 +176,7 @@ function WatchCourse({ courseId, userId }: Props) {
       chapter: data.progress[0]?.progress,
     });
 
-    return () => {
-      setProgressSocket(null);
-      setActionSocket(null);
-    };
+    return () => {};
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -188,18 +186,18 @@ function WatchCourse({ courseId, userId }: Props) {
         <p className="font-medium px-4 py-3 text-md text-zinc-800">
           {data?.course?.title}
         </p>
-        {data?.progress?.length > 0 && (
-          <div className="px-3 border-b pb-4 transition-all">
-            <progress
-              className="progress w-full progress-info transition-all"
-              value={onCalculate()}
-              max="100"
-            />
-            <p className="font-medium text-sm">
-              {onCalculate()}% Complete
-            </p>
-          </div>
-        )}
+
+        <div className="px-3 border-b pb-4 transition-all">
+          <progress
+            className="progress w-full progress-info transition-all"
+            value={onCalculate()}
+            max="100"
+          />
+          <p className="font-medium text-sm">
+            {onCalculate()}% Complete
+          </p>
+        </div>
+
         <Suspense fallback="">
           <SidebarChapter
             isMobile={false}
@@ -230,7 +228,7 @@ function WatchCourse({ courseId, userId }: Props) {
               </Suspense>
             )}
           </div>
-          <div className="mt-4 block lg:hidden bg-slate-300/20 rounded-md w-full mx-auto py-4">
+          <div className="mt-4 block lg:hidden bg-zinc-50 rounded-md w-full mx-auto py-4">
             <SidebarChapter
               isMobile
               currentVideo={currentVideo}
@@ -238,12 +236,12 @@ function WatchCourse({ courseId, userId }: Props) {
               list={data?.course?.chapter_course}
             />
           </div>
-          <div className="lg:col-span-1 pt-4  p-2 h-full w-full relative">
+          <div className="lg:col-span-1 pt-4  lg:p-2 pb-4 lg:pb-0 h-full w-full relative">
 
-            <div className=" p-4 rounded ">
+            <div className=" lg:p-4 rounded ">
               <Message onAction={onAction} />
-              <span className="w-full block  h-[1px] my-2 rounded-full" />
-              <div className="flex flex-col gap-4 w-full border  p-4 rounded-md max-h-[50%] overflow-y-auto">
+              <span className="w-full block  h-[1px] lg:my-2 my-1 rounded-full" />
+              <div className="flex flex-col gap-4 bg-zinc-50 w-full border  p-4 rounded-md max-h-[50%] overflow-y-auto">
                 <p className="font-medium text-sm  text-zinc-800">Comments</p>
                 <span className="w-full block bg-zinc-200 h-[1px] rounded-full" />
                 {(data?.course?.chapter_course[currentVideo]?.comment.length <= 0
@@ -256,11 +254,10 @@ function WatchCourse({ courseId, userId }: Props) {
                   ?.comment?.map((item: any, index: number) => (
                   // eslint-disable-next-line react/no-array-index-key
                     <div key={index} className=" w-full">
-                      <p className="text-sm font-normal  text-zinc-700">@{item?.user.replace('@gmail.com', '')}</p>
-                      <p className="text-sm text-justify  pt-1 text-black">
+                      <p className="text-sm font-normal  text-zinc-500">@{item?.user.replace('@gmail.com', '')}</p>
+                      <p className="text-sm text-justify  pt-1 text-zinc-900">
                         {item?.message}
                       </p>
-                      <span className="w-full block bg-zinc-200 mt-1 h-[1px] rounded-full" />
                     </div>
                   ))}
                 {messageSocket?.filter((item) => item.currentVideo
@@ -271,15 +268,15 @@ function WatchCourse({ courseId, userId }: Props) {
                       <div key={item.message} className="  w-full">
                         <div className="skeleton h-4 w-28" />
                         <div className="skeleton h-4 w-full  mt-2" />
-                        <span className="w-full block bg-zinc-200 mt-1 h-[1px] rounded-full" />
+
                       </div>
                     ) : (
                       <div key={item.message} className="  w-full">
-                        <p className="text-sm font-normal  text-zinc-700">@{item?.name.replace('@gmail.com', '')}</p>
-                        <p className="text-sm text-justify   pt-1 text-black">
+                        <p className="text-sm font-normal  text-zinc-500">@{item?.name.replace('@gmail.com', '')}</p>
+                        <p className="text-sm text-justify   pt-1 text-zinc-900">
                           {item?.message}
                         </p>
-                        <span className="w-full block bg-zinc-200 h-[1px] mt-1 rounded-full" />
+
                       </div>
                     )
                   ))}
