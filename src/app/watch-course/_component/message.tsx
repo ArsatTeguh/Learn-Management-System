@@ -40,7 +40,7 @@ function Message({ onAction }: Props) {
     }
   };
   return (
-    <div className="lg:mt-10 mt-5 w-full flex items-center justify-center">
+    <div className="lg:mt-5 mt-5 w-full flex items-center justify-center">
       <input
         type="text"
         name=""

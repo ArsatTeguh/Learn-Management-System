@@ -1,20 +1,18 @@
 'use client';
 
 import React, {
-  useCallback, useState, Suspense, useEffect,
+  useState, Suspense, useEffect,
 } from 'react';
 import useSWR from 'swr';
 import Toast from '@/lib/toast';
 import CustomeFetch from '@/lib/customeFetch';
 import calculateProgress from '@/lib/calculateProgress';
-import Pusher from 'pusher-js';
-import { FetchSocket } from '@/lib/fetchSocket';
 import { CalculateAction } from '@/lib/calculateaAction';
 import SidebarChapter from './sidebar';
 import VideoPage from './videoPage';
 import Message from './message';
 import {
-  ActionType, CallbackMessage, fetcher, InputAction, MessageType, OnActionType, ProgressType,
+  ActionType, fetcher, InputAction, MessageType, OnActionType, ProgressType,
   updateProgress,
 } from './typeData';
 
@@ -28,12 +26,20 @@ function WatchCourse({ courseId, userId }: Props) {
   const [actionSocket, setActionSocket] = useState<Array<ActionType> | null>(null);
   const [messageSocket, setMessageSocket] = useState<Array<MessageType> | null >(null);
   const [progressSocket, setProgressSocket] = useState<ProgressType | null>(null);
-  const { Fetch } = CustomeFetch();
+  const { Fetch, loading } = CustomeFetch();
 
-  const { data } = useSWR(`${process.env.NEXT_PUBLIC_API_URL}/api/chapter/${courseId}/${userId}`, fetcher, {
-    revalidateOnFocus: false,
-    revalidateOnReconnect: false,
-  });
+  const { data } = useSWR(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/chapter/${courseId}/${userId}`,
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      dedupingInterval: 10000,
+      keepPreviousData: true,
+      suspense: true,
+    },
+  );
+
   const chapterId = data?.course?.chapter_course[currentVideo]?.asset_id;
   const checkout = async () => {
     const request = {
@@ -79,6 +85,7 @@ function WatchCourse({ courseId, userId }: Props) {
         courseId,
         chapterId,
       };
+
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const res = await updateProgress(`${process.env.NEXT_PUBLIC_API_URL}/api/chapter/progress`, dataProgress);
       if (res.status === 200) {
@@ -115,9 +122,7 @@ function WatchCourse({ courseId, userId }: Props) {
       chapterId: currentVideo,
       data: requestAction,
     };
-    if (message.trim() !== '') {
-      FetchSocket({ url: 'message', body: { name, message, currentVideo: chapterId } });
-    } else {
+    if (message.trim() === '') {
       const currenAction = actionSocket?.filter((item: ActionType) => item.id === currentVideo);
       const newAction = CalculateAction({
         actionSocket: currenAction ? currenAction[0] : {},
@@ -134,6 +139,13 @@ function WatchCourse({ courseId, userId }: Props) {
           return item;
         });
       });
+    } else {
+      setMessageSocket((prev) => {
+        if (prev === null) {
+          return [{ currentVideo: chapterId, name, message }];
+        }
+        return [...prev, { currentVideo: chapterId, name, message }];
+      });
     }
     await Fetch({ url: 'api/chapter/message', method: 'POST', body: req });
   };
@@ -143,46 +155,32 @@ function WatchCourse({ courseId, userId }: Props) {
     progressSocket?.count as number,
   );
 
-  const onCurrentVideo = useCallback((videoId: number) => {
+  const onCurrentVideo = (videoId: number) => {
     setCurrentVideo(videoId);
-  }, []);
+  };
 
   useEffect(() => {
-    data?.course?.chapter_course.map((item: any, index: number) => checkOnActionById(
-      { index, like: item.action.isLike, dislike: item.action.isDislike },
-    ));
+    if (!data) return;
+
+    data.course?.chapter_course?.forEach((item: any, index: number) => {
+      checkOnActionById({
+        index,
+        like: item.action.isLike,
+        dislike: item.action.isDislike,
+      });
+    });
+
     setProgressSocket({
-      count: data?.course?.length_chapter,
-      chapter: data?.progress[0]?.progress,
+      count: data.course?.length_chapter,
+      chapter: data.progress[0]?.progress,
     });
-    return () => {};
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data]);
 
-  useEffect(() => {
-    const pusherClinet = new Pusher('3006004164fdcfb53231', {
-      cluster: 'ap1',
-      forceTLS: true,
-    });
-    const handlerMessage = (res: CallbackMessage) => {
-      setMessageSocket((prev) => {
-        const newprev = prev || [];
-        return [...newprev,
-          { name: res.name, message: res.message, currentVideo: res.currentVideo }];
-      });
+    return () => {
+      setProgressSocket(null);
+      setActionSocket(null);
     };
-    let channel: any;
-    if (chapterId) {
-      channel = pusherClinet.subscribe(chapterId);
-      channel.bind('chat', (res: CallbackMessage) => {
-        handlerMessage(res);
-      });
-      return () => {
-        channel.unbind('chat', handlerMessage);
-        pusherClinet.unsubscribe(chapterId);
-      };
-    }
-  }, [chapterId, currentVideo]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div>
@@ -198,8 +196,7 @@ function WatchCourse({ courseId, userId }: Props) {
               max="100"
             />
             <p className="font-medium text-sm">
-              {onCalculate()}
-              % Complete
+              {onCalculate()}% Complete
             </p>
           </div>
         )}
@@ -243,10 +240,12 @@ function WatchCourse({ courseId, userId }: Props) {
           </div>
           <div className="lg:col-span-1 pt-4  p-2 h-full w-full relative">
 
-            <div className="bg-slate-300/20 p-4 rounded ">
-              <p className="font-medium text-lg text-zinc-800">Comment</p>
+            <div className=" p-4 rounded ">
               <Message onAction={onAction} />
-              <div className="flex flex-col gap-4 w-full   p-4 rounded-md max-h-[50%] overflow-y-auto">
+              <span className="w-full block  h-[1px] my-2 rounded-full" />
+              <div className="flex flex-col gap-4 w-full border  p-4 rounded-md max-h-[50%] overflow-y-auto">
+                <p className="font-medium text-sm  text-zinc-800">Comments</p>
+                <span className="w-full block bg-zinc-200 h-[1px] rounded-full" />
                 {(data?.course?.chapter_course[currentVideo]?.comment.length <= 0
               && messageSocket === null) && (
                 <div>
@@ -256,25 +255,33 @@ function WatchCourse({ courseId, userId }: Props) {
                 {data?.course?.chapter_course[currentVideo]
                   ?.comment?.map((item: any, index: number) => (
                   // eslint-disable-next-line react/no-array-index-key
-                    <div key={index} className="border-b w-full">
-                      <p className="text-sm font-medium text-black">@{item?.user}</p>
-                      <p className="text-xs text-justify text-black">
+                    <div key={index} className=" w-full">
+                      <p className="text-sm font-normal  text-zinc-700">@{item?.user.replace('@gmail.com', '')}</p>
+                      <p className="text-sm text-justify  pt-1 text-black">
                         {item?.message}
                       </p>
-                      <span className="w-full block bg-zinc-200 h-[1px] mt-1 rounded-full" />
+                      <span className="w-full block bg-zinc-200 mt-1 h-[1px] rounded-full" />
                     </div>
                   ))}
                 {messageSocket?.filter((item) => item.currentVideo
               === chapterId)
-                  .map((item, index: number) => (
+                  .map((item) => (
                   // eslint-disable-next-line react/no-array-index-key
-                    <div key={index} className="border-b w-full">
-                      <p className="text-sm font-medium text-black">@{item?.name}</p>
-                      <p className="text-xs text-justify text-black">
-                        {item?.message}
-                      </p>
-                      <span className="w-full block bg-zinc-200 h-[1px] mt-1 rounded-full" />
-                    </div>
+                    loading ? (
+                      <div key={item.message} className="  w-full">
+                        <div className="skeleton h-4 w-28" />
+                        <div className="skeleton h-4 w-full  mt-2" />
+                        <span className="w-full block bg-zinc-200 mt-1 h-[1px] rounded-full" />
+                      </div>
+                    ) : (
+                      <div key={item.message} className="  w-full">
+                        <p className="text-sm font-normal  text-zinc-700">@{item?.name.replace('@gmail.com', '')}</p>
+                        <p className="text-sm text-justify   pt-1 text-black">
+                          {item?.message}
+                        </p>
+                        <span className="w-full block bg-zinc-200 h-[1px] mt-1 rounded-full" />
+                      </div>
+                    )
                   ))}
               </div>
             </div>

@@ -1,8 +1,10 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 export default function CustomeFetch() {
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const Fetch = async ({
     url,
@@ -13,6 +15,7 @@ export default function CustomeFetch() {
     method: string;
     body: Object;
   }) => {
+    setLoading(true);
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/${url}`, {
       method,
       headers: {
@@ -20,11 +23,12 @@ export default function CustomeFetch() {
       },
       body: JSON.stringify(body),
     });
+    setLoading(false);
     if (response.status === 401) {
       router.push('/auth/signin');
     }
     return response;
   };
 
-  return { Fetch };
+  return { Fetch, loading };
 }
