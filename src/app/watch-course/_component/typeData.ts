@@ -47,6 +47,16 @@ export async function fetcher(url: string) {
   return result.data;
 }
 
+export async function fetcherAll(url: string) {
+  const res = await fetch(url, {
+    headers: {
+      Accept: 'application/json',
+    },
+  });
+  const result = await res.json();
+  return result.data;
+}
+
 export async function updateProgress(url: string, data: any) {
   const response = await fetch(url, {
     method: 'POST',

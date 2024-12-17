@@ -42,9 +42,8 @@ function WatchCourse({ courseId, userId }: Props) {
 
   const chapterId = data?.course?.chapter_course[currentVideo]?.asset_id;
   const checkout = async () => {
-    const d = new Date();
     const request = {
-      id: courseId + d.getMinutes(),
+      id: courseId,
       productName: data?.course?.title as string,
       price: data?.course?.price as number,
       quantity: 1,

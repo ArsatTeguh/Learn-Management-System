@@ -36,7 +36,7 @@ function VideoPage({
     <div className="mt-4">
       {video.chapter_course[currentVideo].unLock ? (
         <span className="aspect-video   text-white h-full flex items-center rounded justify-center bg-black">
-          <p className="text-xl py-2 font-medium bg-red-500 w-full text-center">
+          <p className="lg:text-xl text-sm py-2 font-medium bg-red-500 w-full text-center">
             Make a Purchase to advance to this lesson
           </p>
         </span>

@@ -3,7 +3,7 @@
 import React from 'react';
 import useSWR from 'swr';
 import { useSearchParams } from 'next/navigation';
-import { fetcher } from '@/app/watch-course/_component/typeData';
+import { fetcherAll } from '@/app/watch-course/_component/typeData';
 import CardCourse from './cardCourse';
 import LoadingCard from './loadingCard';
 
@@ -12,7 +12,7 @@ function PageCourse({ userId } : { userId: string }) {
   const category = searchParams.get('category');
 
   // const title = searchParams.get('title');
-  const { data, isLoading } = useSWR(`${process.env.NEXT_PUBLIC_API_URL}/api/courseAll/?category=${category ?? ''}`, fetcher);
+  const { data, isLoading } = useSWR(`${process.env.NEXT_PUBLIC_API_URL}/api/courseAll/?category=${category ?? ''}`, fetcherAll);
 
   return (
     <div>
