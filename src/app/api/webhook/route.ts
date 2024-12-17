@@ -6,12 +6,13 @@ import { NextResponse } from 'next/server';
 export async function POST(request: Request | any) {
   await connectMongoDB();
   try {
+    const body = await request.json();
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    const { transactionStatus, fraudStatus, order_id } = await request.json();
-    const [courseId, userId] = order_id.split('*');
+    const { transaction_status, fraud_status, order_id } = body;
+    const [courseId, userId] = order_id.split('>');
 
-    if (transactionStatus === 'settlement') {
-      if (fraudStatus === 'accept') {
+    if (transaction_status === 'settlement') {
+      if (fraud_status === 'accept') {
         await CourseModel.updateOne(
           { _id: courseId },
           { $push: { buyer_id: userId } },
@@ -27,8 +28,8 @@ export async function POST(request: Request | any) {
 
     return NextResponse.json({
       message: `${courseId} dan ${userId}`,
-      status: transactionStatus,
-      fraud: fraudStatus,
+      status: transaction_status,
+      fraud: fraud_status,
     }, { status: 200 });
   } catch (error: any) {
     return NextResponse.json({
