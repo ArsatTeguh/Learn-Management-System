@@ -1,7 +1,13 @@
 import mongoose from 'mongoose';
+import ShortUniqueId from 'short-unique-id';
 
+const uid = new ShortUniqueId({ length: 3 });
 const AuthSchema = new mongoose.Schema(
   {
+    _id: {
+      type: String,
+      default: () => uid.randomUUID(),
+    },
     email: { type: String, required: true },
     password: { type: String, required: true },
     image: { type: String, required: false },
