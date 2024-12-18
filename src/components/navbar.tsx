@@ -46,8 +46,9 @@ function Navbar({ token, list }: { token: string; list: any }) {
           status: 'success',
           message: 'Transaction Success',
         });
-        localStorage.setItem('selectedPaymentMethod', JSON.stringify(''));
+        localStorage.setItem(`selectedPaymentMethod/${user.userId}`, JSON.stringify(''));
         onTransaction(initialState);
+        setModal(false);
       }
     } else {
       setModal(false);
@@ -61,12 +62,12 @@ function Navbar({ token, list }: { token: string; list: any }) {
   }, [dispatch, token]);
 
   useEffect(() => {
-    const savedPaymentMethod = localStorage.getItem('selectedPaymentMethod');
+    const savedPaymentMethod = localStorage.getItem(`selectedPaymentMethod/${user.userId}`);
     if (savedPaymentMethod) {
       const format:PropsTransaction = JSON.parse(savedPaymentMethod);
       onTransaction(format);
     }
-  }, [onTransaction]);
+  }, [onTransaction, user.userId]);
 
   const router = useRouter();
   return (

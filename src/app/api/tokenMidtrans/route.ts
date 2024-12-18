@@ -25,7 +25,7 @@ export async function POST(request: Request | any) {
         quantity,
       },
       transaction_details: {
-        order_id: `${id}${d.getMinutes()}-${request.id}`,
+        order_id: `${id}-${d.getMinutes()}-${request.id}`,
         gross_amount: price * quantity,
       },
       customer_details: {

@@ -53,6 +53,7 @@ export async function POST(request: Request) {
       value: token,
       httpOnly: false,
       path: '/',
+      domain: process.env.NODE_ENV !== 'development' ? 'localhost:3000' : 'learn-management-system-one.vercel.app',
       maxAge: 86400,
       sameSite: 'strict',
       secure: process.env.NODE_ENV !== 'development',

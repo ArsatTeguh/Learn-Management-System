@@ -68,7 +68,7 @@ function WatchCourse({ courseId, userId }: Props) {
         },
         onPending: (result: any) => {
           /* You may add your own implementation here */
-          localStorage.setItem('selectedPaymentMethod', JSON.stringify({ transaction: result, request }));
+          localStorage.setItem(`selectedPaymentMethod-${userId}`, JSON.stringify({ transaction: result, request }));
           onTransaction({ request, transaction: result });
         },
         onError: (result: any) => {
