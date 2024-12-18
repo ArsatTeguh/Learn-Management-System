@@ -3,6 +3,7 @@ import slice from './slice';
 import userSlice from './userSlice';
 import CourseSlice from './CourseSlice';
 import modalSlice from './modalSlice';
+import transaction from './transaction';
 
 const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ const store = configureStore({
     user: userSlice,
     course: CourseSlice,
     modal: modalSlice,
+    transaction,
   },
 });
 

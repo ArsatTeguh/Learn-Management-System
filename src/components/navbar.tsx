@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 // eslint-disable-next-line import/no-cycle
 import { getToken } from '@/lib/client-token';
 import { RootState } from '@/state/store';
@@ -10,8 +10,12 @@ import { useRouter } from 'next/navigation';
 import { GiHamburgerMenu } from 'react-icons/gi';
 import { PiSignOut } from 'react-icons/pi';
 import { useDispatch, useSelector } from 'react-redux';
+import DispatchTransaction from '@/lib/dispatchTrasanction';
+import { initialState, PropsTransaction } from '@/state/transaction';
+import Toast from '@/lib/toast';
 import Sidebar from './sidebar';
 import Search from './search';
+import ModalNavbar from './modalNavbar';
 
 export type UserProps = {
   profile: string;
@@ -20,14 +24,49 @@ export type UserProps = {
 };
 
 function Navbar({ token, list }: { token: string; list: any }) {
+  const [onModal, setModal] = useState(false);
   const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.user);
+  const { transaction, onTransaction } = DispatchTransaction();
+
+  const onActionModal = async (action: 'done' | 'close') => {
+    if (action === 'done') {
+      const [courseId, userId] = transaction.transaction.order_id.split('@');
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/chapter/existBuyer/${courseId}/${userId}`,
+        { cache: 'force-cache' },
+      );
+      if (!response.ok) {
+        Toast({
+          status: 'error',
+          message: 'Transaction Pending',
+        });
+      } else {
+        Toast({
+          status: 'success',
+          message: 'Transaction Success',
+        });
+        localStorage.setItem('selectedPaymentMethod', JSON.stringify(''));
+        onTransaction(initialState);
+      }
+    } else {
+      setModal(false);
+    }
+  };
 
   useEffect(() => {
     const information = getToken({ token });
     dispatch(setUser(information as UserProps));
     return () => {};
   }, [dispatch, token]);
+
+  useEffect(() => {
+    const savedPaymentMethod = localStorage.getItem('selectedPaymentMethod');
+    if (savedPaymentMethod) {
+      const format:PropsTransaction = JSON.parse(savedPaymentMethod);
+      onTransaction(format);
+    }
+  }, [onTransaction]);
 
   const router = useRouter();
   return (
@@ -60,6 +99,34 @@ function Navbar({ token, list }: { token: string; list: any }) {
         </div>
         {token ? (
           <div className="items-center gap-2 px-2 flex ">
+            <div
+              tabIndex={0}
+              role="button"
+              id="my_modal_7"
+              className="btn btn-ghost btn-circle"
+              onClick={() => setModal(true)}
+            >
+              {transaction.transaction.fraud_status !== '' && (
+                <div className="indicator">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+                    />
+                  </svg>
+                  <span className="badge badge-sm bg-slate-800 py-2 text-white indicator-item">{transaction.transaction.fraud_status !== '' ? 1 : 0}</span>
+                </div>
+              )}
+              {/* The button to open modal */}
+            </div>
             <div className="flex items-center gap-3">
               <Image
                 src={user?.profile ?? ''}
@@ -103,6 +170,9 @@ function Navbar({ token, list }: { token: string; list: any }) {
           </div>
         )}
       </div>
+      {onModal && (
+        <ModalNavbar handler={onActionModal} data={transaction} />
+      )}
     </div>
   );
 }

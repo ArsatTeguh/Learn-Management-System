@@ -8,6 +8,8 @@ import Toast from '@/lib/toast';
 import CustomeFetch from '@/lib/customeFetch';
 import calculateProgress from '@/lib/calculateProgress';
 import { CalculateAction } from '@/lib/calculateaAction';
+import DispatchTransaction from '@/lib/dispatchTrasanction';
+import { initialState } from '@/state/transaction';
 import SidebarChapter from './sidebar';
 import VideoPage from './videoPage';
 import Message from './message';
@@ -27,6 +29,7 @@ function WatchCourse({ courseId, userId }: Props) {
   const [messageSocket, setMessageSocket] = useState<Array<MessageType> | null >(null);
   const [progressSocket, setProgressSocket] = useState<ProgressType | null>(null);
   const { Fetch, loading } = CustomeFetch();
+  const { onTransaction } = DispatchTransaction();
 
   const { data } = useSWR(
     `${process.env.NEXT_PUBLIC_API_URL}/api/chapter/${courseId}/${userId}`,
@@ -58,7 +61,29 @@ function WatchCourse({ courseId, userId }: Props) {
       if (!req.ok) {
         throw new Error(res.message);
       }
-      (window as any).snap.pay(res.token);
+      (window as any).snap.pay(res.token, {
+        onSuccess: () => {
+          /* You may add your own implementation here */
+          onTransaction(initialState);
+        },
+        onPending: (result: any) => {
+          /* You may add your own implementation here */
+          localStorage.setItem('selectedPaymentMethod', JSON.stringify({ transaction: result, request }));
+          onTransaction({ request, transaction: result });
+        },
+        onError: (result: any) => {
+          /* You may add your own implementation here */
+          // eslint-disable-next-line no-alert
+          alert('payment failed!'); console.log(result);
+        },
+        onClose: (result: any) => {
+          /* You may add your own implementation here */
+          // eslint-disable-next-line no-alert
+          alert('payment failed!'); console.log(result);
+          // eslint-disable-next-line no-alert
+          alert('you closed the popup without finishing the payment');
+        },
+      });
     } catch (error: any) {
       Toast({
         status: 'error',
@@ -265,10 +290,9 @@ function WatchCourse({ courseId, userId }: Props) {
                   .map((item) => (
                   // eslint-disable-next-line react/no-array-index-key
                     loading ? (
-                      <div key={item.message} className="  w-full">
-                        <div className="skeleton h-4 w-28" />
-                        <div className="skeleton h-4 w-full  mt-2" />
-
+                      <div key={item.message} className="w-full">
+                        <span className="skeleton h-4 block w-28" />
+                        <span className="skeleton block h-4 w-full  mt-2" />
                       </div>
                     ) : (
                       <div key={item.message} className="  w-full">

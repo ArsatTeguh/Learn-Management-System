@@ -8,7 +8,7 @@ type Props = {
 function Layout({ children }: Props) {
   return (
     <div className="">
-      <div className="h-full lg:block hidden mt-20 fixed lg:overflow-y-hidden ">
+      <div className="h-full lg:block hidden mt-20 fixed  lg:overflow-y-hidden ">
         <PageSidebar />
       </div>
       <div className="lg:pl-64 pt-20">{children}</div>

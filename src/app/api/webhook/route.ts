@@ -9,7 +9,7 @@ export async function POST(request: Request | any) {
     const body = await request.json();
     // eslint-disable-next-line @typescript-eslint/naming-convention
     const { transaction_status, fraud_status, order_id } = body;
-    const [courseId, userId] = order_id.split('>');
+    const [courseId, userId] = order_id.split('@');
 
     if (transaction_status === 'settlement') {
       if (fraud_status === 'accept') {
