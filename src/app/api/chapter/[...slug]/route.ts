@@ -1,6 +1,7 @@
 import connectMongoDB from '@/lib/connectDb';
 import CourseModel from '@/models/course';
 import ProgressModel from '@/models/progress';
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { NextResponse } from 'next/server';
 
 export async function GET(
@@ -30,7 +31,7 @@ export async function GET(
     }
 
     const isBuyer = existCourse.buyer_id?.filter((buyerId: string) => buyerId === userId);
-    const newprogress = progress?.filter((item) => item.user_id.equals(userId));
+    const newprogress = progress?.filter((item) => item.user_id === userId);
 
     // Jika course yang dipanggil berstatus Free maka langung buatkan table progress
     if (isFree && userId !== '') {

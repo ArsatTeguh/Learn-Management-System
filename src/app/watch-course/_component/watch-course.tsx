@@ -23,7 +23,7 @@ type Props = {
   courseId: string;
 };
 
-function WatchCourse({ courseId, userId }: Props) {
+function WatchCourse({ courseId = '', userId = '' }: Props) {
   const [currentVideo, setCurrentVideo] = useState<number>(0);
   const [actionSocket, setActionSocket] = useState<Array<ActionType> | null>(null);
   const [messageSocket, setMessageSocket] = useState<Array<MessageType> | null >(null);
@@ -186,7 +186,7 @@ function WatchCourse({ courseId, userId }: Props) {
   };
 
   useEffect(() => {
-    if (!data) return;
+    if (!data?.course?.chapter_course) return;
 
     data.course?.chapter_course?.forEach((item: any, index: number) => {
       checkOnActionById({
@@ -197,13 +197,12 @@ function WatchCourse({ courseId, userId }: Props) {
     });
 
     setProgressSocket({
-      count: data.course?.length_chapter,
-      chapter: data.progress[0]?.progress,
+      count: data?.course?.length_chapter,
+      chapter: data?.progress[0]?.progress,
     });
 
     return () => {};
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [data.course, data?.progress]);
 
   return (
     <div>
