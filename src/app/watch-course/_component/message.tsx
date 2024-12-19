@@ -40,12 +40,12 @@ function Message({ onAction }: Props) {
     }
   };
   return (
-    <div className="lg:mt-5 mt-5 w-full flex items-center justify-center">
+    <div className="lg:mt-5 mt-5 w-full gap-1 flex items-center justify-center">
       <input
         type="text"
         name=""
         id=""
-        className="w-full border  text-zinc-800 py-2 px-4 placeholder:text-sm"
+        className="w-full border rounded  text-zinc-800 py-2 px-4 placeholder:text-sm"
         placeholder="comment chapter"
         value={valueMessage}
         onChange={(event: any) => setValueMessage(event.target.value)}
@@ -53,7 +53,7 @@ function Message({ onAction }: Props) {
       <button
         onClick={onSubmit}
         type="button"
-        className="py-2 px-4 border bg-sky-500 text-white"
+        className="py-2 rounded px-4 border bg-sky-500 text-white"
       >
         Send
       </button>

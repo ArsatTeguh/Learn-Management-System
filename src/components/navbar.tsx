@@ -100,6 +100,7 @@ function Navbar({ token, list }: { token: string; list: any }) {
         </div>
         {token ? (
           <div className="items-center gap-2 px-2 flex ">
+            {transaction.transaction.fraud_status !== '' && (
             <div
               tabIndex={0}
               role="button"
@@ -107,34 +108,33 @@ function Navbar({ token, list }: { token: string; list: any }) {
               className="btn btn-ghost btn-circle"
               onClick={() => setModal(true)}
             >
-              {transaction.transaction.fraud_status !== '' && (
-                <div className="indicator">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-                    />
-                  </svg>
-                  <span className="badge badge-sm bg-slate-800 py-2 text-white indicator-item">{transaction.transaction.fraud_status !== '' ? 1 : 0}</span>
-                </div>
-              )}
+              <div className="indicator">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+                  />
+                </svg>
+                <span className="badge badge-sm bg-slate-800 py-2 text-white indicator-item">{transaction.transaction.fraud_status !== '' ? 1 : 0}</span>
+              </div>
               {/* The button to open modal */}
             </div>
-            <div className="flex items-center gap-3">
+            )}
+            <div className="flex  items-center gap-3">
               <Image
                 src={user?.profile ?? ''}
                 alt="profile"
                 width={50}
                 height={50}
-                className="rounded-full border-[1px]"
+                className="rounded-full border-[1px] w-[57px] h-[45px] lg:w-[50px] lg:h-[50px] "
               />
               <div className="hidden lg:block">
                 <p className="font-medium text-sm text-sky-blue-500">
