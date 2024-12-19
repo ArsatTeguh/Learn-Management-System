@@ -5,7 +5,7 @@ const uid = new ShortUniqueId({ length: 3 });
 const AuthSchema = new mongoose.Schema(
   {
     _id: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
       default: () => uid.randomUUID(),
     },
     email: { type: String, required: true },
